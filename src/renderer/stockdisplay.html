@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --gray-color: #95a5a6;
+            --border-radius: 6px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            margin-right: 10px;
+            color: var(--accent-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            background-color: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            font-size: 28px;
+            border-bottom: 2px solid var(--light-color);
+            padding-bottom: 10px;
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-color);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 12px 12px 40px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 15px;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-success {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 1rem;
+            border-radius: var(--border-radius);
+            border: 1px solid #e0e0e0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: var(--primary-color);
+            position: sticky;
+            top: 0;
+        }
+
+        tr:hover {
+            background-color: #f9fbfd;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-pill {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .status-low {
+            background-color: #ffeaea;
+            color: var(--danger-color);
+        }
+
+        .status-medium {
+            background-color: #fff4e6;
+            color: var(--warning-color);
+        }
+
+        .status-good {
+            background-color: #e6ffee;
+            color: var(--accent-color);
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            color: var(--gray-color);
+        }
+
+        .loading i {
+            margin-right: 10px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background-color: #fde8e8;
+            color: var(--danger-color);
+            padding: 15px;
+            margin: 1rem 0;
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray-color);
+            font-style: italic;
+        }
+
+        .timestamp {
+            text-align: right;
+            color: var(--gray-color);
+            font-size: 0.9em;
+            margin-top: 1.5rem;
+        }
+
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            max-width: 350px;
+        }
+
+        .notification {
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: slideIn 0.3s ease forwards;
+        }
+
+        .notification-content {
+            display: flex;
+            align-items: center;
+        }
+
+        .notification-content i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .notification-close {
+            cursor: pointer;
+            font-size: 20px;
+            margin-left: 15px;
+            opacity: 0.7;
+            transition: var(--transition);
+        }
+
+        .notification-close:hover {
+            opacity: 1;
+        }
+
+        .notification-success {
+            background-color: #eefaf0;
+            color: var(--accent-color);
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .notification-error {
+            background-color: #fde8e8;
+            color: var(--danger-color);
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .notification-warning {
+            background-color: #fef6e6;
+            color: var(--warning-color);
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .notification-info {
+            background-color: #e6f3fa;
+            color: var(--secondary-color);
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-container {
+                max-width: 100%;
+                margin-bottom: 1rem;
+            }
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem 0;
+            margin-top: 2rem;
+            color: var(--gray-color);
+            font-size: 0.9em;
+            background-color: #f8f9fa;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <main class="main-content">
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <i class="fas fa-box"></i>
+                StockPro
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1>Inventory Management</h1>
+        
+        <div class="toolbar">
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Search by product name or code...">
+            </div>
+            
+            <button id="refreshBtn" class="btn btn-primary">
+                <i class="fas fa-sync-alt"></i> Refresh Data
+            </button>
+        </div>
+        
+        <div id="loading" class="loading" style="display: none;">
+            <i class="fas fa-circle-notch"></i> Loading inventory data...
+        </div>
+        
+        <div id="errorMessage" class="error" style="display: none;"></div>
+        
+        <div class="table-container">
+            <table id="stockTable">
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Product Code</th>
+                        <th>Quantity</th>
+                        <th>Status</th>
+                        <th>Last Updated</th>
+                    </tr>
+                </thead>
+                <tbody id="stockTableBody">
+                    <!-- Stock data will be inserted here -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div id="noData" class="no-data" style="display: none;">
+            <i class="fas fa-info-circle"></i> No inventory data available.
+        </div>
+        
+        <div class="timestamp">Last updated: <span id="lastUpdated">-</span></div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 KashafNoor-Libaas . All rights reserved.</p>
+    </footer>
+    </main>
+    <script src="js/navbar.js"></script>
+    <script>
+        // Global variable to store all stock data
+        let allStockData = [];
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeStockPage();
+        });
+        
+        async function initializeStockPage() {
+            // Load stock data on page load
+            await loadStockData();
+            
+            // Add refresh button functionality
+            document.getElementById('refreshBtn').addEventListener('click', loadStockData);
+            
+            // Add search functionality
+            document.getElementById('searchInput').addEventListener('input', filterStockData);
+        }
+
+        async function loadStockData() {
+            const tableBody = document.getElementById('stockTableBody');
+            const loadingElement = document.getElementById('loading');
+            const errorElement = document.getElementById('errorMessage');
+            const noDataElement = document.getElementById('noData');
+            
+            // Show loading message
+            loadingElement.style.display = 'flex';
+            errorElement.style.display = 'none';
+            noDataElement.style.display = 'none';
+            tableBody.innerHTML = '';
+            
+            try {
+                // Call the API to get stock data using the same structure from the provided code
+                allStockData = await window.api.getAllStock();
+                console.log('Loaded Stock Data:', allStockData);
+                
+                // Update timestamp
+                document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+                
+                // Hide loading message
+                loadingElement.style.display = 'none';
+                
+                // Display the data
+                displayStockData(allStockData);
+                
+                // Show success notification
+                showNotification('Inventory data successfully loaded', 'success');
+            } catch (error) {
+                // Hide loading message and show error
+                loadingElement.style.display = 'none';
+                errorElement.innerHTML = `<i class="fas fa-exclamation-circle"></i> Error loading inventory data: ${error.message || 'Unknown error'}`;
+                errorElement.style.display = 'block';
+                console.error('Error loading stock data:', error);
+                showNotification('Warning: Could not load inventory data', 'error');
+            }
+        }
+        
+        function displayStockData(stockData) {
+            const tableBody = document.getElementById('stockTableBody');
+            const noDataElement = document.getElementById('noData');
+            
+            tableBody.innerHTML = '';
+            
+            if (stockData && stockData.length > 0) {
+                stockData.forEach(item => {
+                    const row = document.createElement('tr');
+                    
+                    // Format the date if it exists
+                    const lastUpdated = item.last_updated 
+                        ? new Date(item.last_updated).toLocaleString() 
+                        : 'N/A';
+                    
+                    // Determine stock status based on quantity
+                    let statusClass = '';
+                    let statusText = '';
+                    const quantity = item.quantity !== undefined ? item.quantity : 0;
+                    
+                    if (quantity <= 10) {
+                        statusClass = 'status-low';
+                        statusText = 'Low Stock';
+                    } else if (quantity <= 30) {
+                        statusClass = 'status-medium';
+                        statusText = 'Medium Stock';
+                    } else {
+                        statusClass = 'status-good';
+                        statusText = 'Good Stock';
+                    }
+                    
+                    row.innerHTML = `
+                        <td>${item.product_name || 'N/A'}</td>
+                        <td>${item.product_code || 'N/A'}</td>
+                        <td>${quantity}</td>
+                        <td><span class="status-pill ${statusClass}">${statusText}</span></td>
+                        <td>${lastUpdated}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+                noDataElement.style.display = 'none';
+            } else {
+                // Show no data message
+                noDataElement.style.display = 'block';
+            }
+        }
+        
+        function filterStockData() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            if (!searchTerm) {
+                // If search is empty, show all data
+                displayStockData(allStockData);
+                return;
+            }
+            
+            // Filter the data based on search term
+            const filteredData = allStockData.filter(item => 
+                (item.product_name && item.product_name.toLowerCase().includes(searchTerm)) || 
+                (item.product_code && item.product_code.toLowerCase().includes(searchTerm))
+            );
+            
+            // Display filtered data
+            displayStockData(filteredData);
+        }
+        
+        // Improved notification function
+        function showNotification(message, type = 'info') {
+            // Check if notification container exists, create if it doesn't
+            let notificationContainer = document.getElementById('notificationContainer');
+            
+            if (!notificationContainer) {
+                notificationContainer = document.createElement('div');
+                notificationContainer.id = 'notificationContainer';
+                notificationContainer.className = 'notification-container';
+                document.body.appendChild(notificationContainer);
+            }
+            
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            
+            // Set icon based on notification type
+            let icon = '';
+            switch(type) {
+                case 'success':
+                    icon = 'fas fa-check-circle';
+                    break;
+                case 'error':
+                    icon = 'fas fa-exclamation-circle';
+                    break;
+                case 'warning':
+                    icon = 'fas fa-exclamation-triangle';
+                    break;
+                default:
+                    icon = 'fas fa-info-circle';
+            }
+            
+            // Create notification content
+            const content = document.createElement('div');
+            content.className = 'notification-content';
+            content.innerHTML = `<i class="${icon}"></i> ${message}`;
+            notification.appendChild(content);
+            
+            // Add close button
+            const closeBtn = document.createElement('span');
+            closeBtn.innerHTML = '&times;';
+            closeBtn.className = 'notification-close';
+            closeBtn.onclick = function() {
+                notificationContainer.removeChild(notification);
+            };
+            notification.appendChild(closeBtn);
+            
+            // Add to container
+            notificationContainer.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

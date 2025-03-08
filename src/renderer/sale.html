@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sale Page</title>
+    <style>
+      * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+}
+
+body {
+    background-color: #f5f5f5;
+    min-height: 100vh;
+    overflow: hidden;
+    font-size: 12px;
+}
+
+.header {
+    background-color: #1a1a1a;
+    color: white;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    height: 36px;
+}
+
+.back-button {
+    color: white;
+    text-decoration: none;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.main-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    padding: 16px;
+    max-width: 1800px;
+    margin: 0 auto;
+    height: calc(100vh - 36px);
+    overflow: hidden;
+}
+
+.section {
+    background: white;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    padding: 16px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.customer-info {
+    background-color: #f8f9fa;
+    padding: 12px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    border: 1px solid #e9ecef;
+}
+
+.customer-select {
+    background: transparent;
+    border: none;
+    font-size: 13px;
+    margin-bottom: 2px;
+    width: 100%;
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+.customer-phone {
+    color: #6c757d;
+    font-size: 11px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.form-group {
+    margin-bottom: 8px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 11px;
+    color: #495057;
+    margin-bottom: 4px;
+    font-weight: 500;
+}
+
+input[type="date"],
+input[type="text"],
+input[type="number"],
+select,
+textarea {
+    width: 100%;
+    padding: 4px 8px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    font-size: 12px;
+    height: 26px;
+}
+
+textarea {
+    height: 40px;
+    resize: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: #90cdf4;
+    box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.15);
+}
+
+.radio-group {
+    display: flex;
+    gap: 12px;
+}
+
+.radio-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.radio-item label {
+    margin: 0;
+    font-size: 12px;
+    color: #4a5568;
+}
+
+.table-container {
+    flex: 1;
+    overflow-y: auto;
+    margin: 12px 0;
+}
+
+.products-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.products-table th,
+.products-table td {
+    padding: 6px 8px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.products-table th {
+    background-color: #f8f9fa;
+    font-weight: 500;
+    color: #4a5568;
+    position: sticky;
+    top: 0;
+    min-width: 80px;
+}
+
+.products-table th:first-child {
+    min-width: 40px;
+}
+
+.products-table th:nth-child(3) {
+    min-width: 150px;
+}
+
+.btn {
+    padding: 4px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    height: 26px;
+}
+
+.btn-primary {
+    background-color: #4299e1;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #3182ce;
+}
+
+.btn-secondary {
+    background-color: #718096;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #4a5568;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.totals-wrapper {
+    margin-top: 16px;
+    padding: 12px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+}
+
+.total-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 0;
+    font-size: 12px;
+    color: #4a5568;
+}
+
+.grand-total {
+    font-weight: 600;
+    color: #2d3748;
+    font-size: 13px;
+    padding-top: 6px;
+    margin-top: 6px;
+    border-top: 2px solid #2d3748;
+}
+
+.actions {
+    margin-top: 16px;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.prominent-total {
+    margin-bottom: 16px;
+    padding: 12px;
+    background-color: #ebf8ff;
+    border-radius: 6px;
+    border: 2px solid #4299e1;
+    text-align: center;
+}
+
+.prominent-total-label {
+    font-size: 12px;
+    color: #2c5282;
+    margin-bottom: 4px;
+}
+
+.prominent-total-amount {
+    font-size: 20px;
+    font-weight: 700;
+    color: #2b6cb0;
+}
+
+.payment-summary {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 1000;
+    overflow: auto;
+}
+
+.modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 16px;
+    border-radius: 6px;
+    width: 90%;
+    max-width: 800px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #718096;
+}
+
+.modal-body {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.modal-footer {
+    margin-top: 16px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.search-container {
+    margin-bottom: 12px;
+    display: flex;
+    gap: 8px;
+}
+
+#searchProduct {
+    flex: 1;
+}
+
+#searchQuantity {
+    width: 60px;
+}
+
+.selection-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 12px;
+    color: #4a5568;
+    align-items: center;
+}
+
+.print-options {
+    margin-top: 12px;
+    padding: 8px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+}
+
+.print-options-label {
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #4a5568;
+    font-size: 12px;
+}
+
+/* .payment-details-container {
+    display: none;
+} */
+
+#grandTotal,
+#netTotal,
+#change {
+    background: transparent;
+    border: none;
+    font-size: inherit;
+    font-weight: inherit;
+    color: inherit;
+    width: 100px;
+    text-align: right;
+    padding-right: 0;
+}
+
+#grandTotal:focus,
+#netTotal:focus,
+#change:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.highlighted-total {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2b6cb0;
+}
+
+/* Other utility classes remain unchanged */
+.loading-spinner,
+.notification,
+.success,
+.error {
+    font-size: 12px;
+}
+.modal .row {
+    display: flex;
+    margin: -10px;
+}
+
+.modal .col {
+    flex: 1;
+    padding: 10px;
+}
+
+.modal .table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+}
+
+.modal .table th,
+.modal .table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.modal .table th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+.bill-info {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 4px;
+}
+    </style>
+</head>
+<body>
+    <main class="main-content" style="margin-top: 2px;">
+    <div class="main-container">
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">Payment Details</div>
+            </div>
+
+            <form id="salesForm">
+            
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="date">Date</label>
+                        <input type="date" id="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="customer">Customer Name</label>
+                        <input type="text" class="form-control" id="customer" 
+                               placeholder="Search and select customer" >
+                        <datalist id="customerList"></datalist>
+                    </div>
+                   
+                </div>
+
+                
+              
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Payment Method</label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" id="cash" name="paymentMethod" value="cash" checked>
+                                <label for="cash">Cash</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" id="credit" name="paymentMethod" value="credit">
+                                <label for="credit">Credit</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" style="display: none;">
+                        <label>Transaction Type</label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" id="sale" name="transactionType" value="sale" checked>
+                                <label for="sale">Sale</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" id="return" name="transactionType" value="return">
+                                <label for="return">Return</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <!-- Payment details moved to the bottom of the form -->
+                <div class="payment-details-container">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="adjustment">Adjustment</label>
+                            <input type="number" id="adjustment" value="0.00" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="customerDiscount">Customer Discount</label>
+                            <input type="number" id="customerDiscount" value="0.00" step="0.01">
+                        </div>
+                    </div>
+               
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="paidAmount">Paid Amount</label>
+                            <input type="number" id="paidAmount" required min="0" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="comments">Comments</label>
+                            <textarea id="comments" maxlength="100" rows="2" style="width:100%; padding:8px; border:1px solid #dee2e6; border-radius:4px; resize:vertical;"></textarea>
+                            <div style="text-align:right; font-size:12px; color:#718096;" id="charCount">0/100</div>
+                        </div>
+                    </div>
+                 
+    
+                </div>
+
+                <div class="print-options">
+                    <div class="print-options-label">Print Receipt?</div>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="printYes" name="printReceipt" value="yes" checked>
+                            <label for="printYes">Yes</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="printNo" name="printReceipt" value="no">
+                            <label for="printNo">No</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button type="button" class="btn btn-secondary" id="cancelButton">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Sale</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">Products</div>
+                <button type="button" class="btn btn-primary" id="addProducts">Add Products (F5)</button>
+            </div>
+            
+            <!-- Moved the prominent total to the right side -->
+            <div class="prominent-total">
+                <div class="prominent-total-label">TOTAL AMOUNT DUE</div>
+                <div class="prominent-total-amount" id="prominentTotal">
+                    <input type="text" id="grandTotal" value="0.00" readonly></div>
+          
+            </div>
+
+            <div class="table-container">
+                <table class="products-table">
+                    <thead>
+                        <tr>
+                            <th>Sr.</th>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Rate</th>
+                            <th>Qty</th>
+                            <th>Total</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsList">
+                        <!-- Products will be added here dynamically -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Adjusted the totals section to appear at the top when no products -->
+            <div class="totals-wrapper">
+                <div class="total-section">
+                    <div class="total-row">
+                        <div>Subtotal</div>
+                        <div id="subTotal">Rs0.00</div>
+                    </div>
+                    <div class="total-row">
+                        <div>Discount</div>
+                        <div id="discountTotal">Rs0.00</div>
+                    </div>
+                    <div class="total-row">
+                        <div>Customer Discount</div>
+                        <div id="customerDiscount">Rs0.00</div>
+                    </div>
+                    <div class="total-row grand-total">
+                        <div>NET TOTAL</div>
+                        <div id="netTotal">Rs0.00</div>
+                    </div>
+                    <div class="payment-summary">
+                        <div class="total-row">
+                            <div>Paid Amount</div>
+                            <div id="paidAmount">Rs0.00</div>
+                        </div>
+                        <div class="total-row">
+                            <div>Change</div>
+                            <div id="change">Rs0.00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+   
+    <!-- Product Selection Modal -->
+    <div id="productsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Select Products</h2>
+                <button class="close-btn" type="button">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="search-container">
+                    <input type="text" id="searchProduct" placeholder="Search products...">
+                    <input type="number" id="searchQuantity" value="1" min="1">
+                </div>
+                <div class="selection-info">
+                    <div>
+                        <input type="checkbox" id="selectAll">
+                        <label for="selectAll">Select All</label>
+                    </div>
+                    <div>Selected: <span id="selectedCount">0</span></div>
+                </div>
+                <div class="table-container">
+                    <table class="products-table">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Code</th>
+                                <th>Name</th>
+                                <th>Price</th>
+                        
+                                <th>Company</th>
+                           
+                                <th>Rack</th>
+                                <th>Stock</th>
+                          
+                            </tr>
+                        </thead>
+                        <tbody id="searchResults"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="modalCancelBtn">Cancel</button>
+                <button type="button" class="btn btn-primary" id="addSelectedBtn">Add Selected</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>Confirm Sale</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to save this sale?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="confirmCancelBtn">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmSubmitBtn">Yes, Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <div class="modal-body">
+                <div style="color: #48bb78; font-size: 48px; margin-bottom: 16px;">✓</div>
+                <p style="font-size: 18px; margin-bottom: 16px;">Sale has been added successfully!</p>
+            </div>
+        </div>
+    </div>
+</main>
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-spinner">
+        <div class="spinner"></div>
+    </div>
+<script src="js/navbar.js"></script>
+    <script src="js/sale.js"></script>
+
+    <script>
+        // Wait for the DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get current date in YYYY-MM-DD format
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0'); // January is 0
+            const day = String(today.getDate()).padStart(2, '0');
+            
+            const formattedDate = `${year}-${month}-${day}`;
+            
+            // Set the value of the date input
+            document.getElementById('date').value = formattedDate;
+            
+            // For debugging
+            console.log("Today's date set to:", formattedDate);
+        });
+    </script>
+
+    </body>
+</html>

@@ -1,0 +1,374 @@
+:root {
+    --primary: #3A4F48;
+    --secondary:black;
+    --dark: #272525;
+    --hover: rgba(255, 255, 255, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Custom Scrollbar Styles */
+*::-webkit-scrollbar {
+    width: 8px;
+}
+
+*::-webkit-scrollbar-track {
+    background: rgba(2, 97, 153, 0.1);
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: var(--primary);
+    border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background-color: #034a7a;
+}
+
+body {
+    background: #f5f5f5;
+    display: flex;
+}
+.nav-section {
+    margin-bottom: 1rem;
+}
+
+.section-header {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 0.75rem 1.5rem;
+    margin-top: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sidebar {
+    background: var(--primary);
+    width: 250px;
+    height: 100vh;
+    position: fixed;
+    left: -250px;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    color: white;
+    overflow-y: auto;
+    
+}
+
+.sidebar.active {
+    left: 0;
+    box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+}
+
+.brand-container {
+    padding: 1.5rem 1rem;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.brand {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.nav-links {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 0;
+    overflow-y: visible; 
+}
+
+.nav-links a, .nav-links .dropdown-trigger {
+    color: white;
+    text-decoration: none;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    position: relative;
+}
+
+.nav-links a:hover, .nav-links .dropdown-trigger:hover {
+    background: var(--hover);
+    padding-left: 2rem;
+}
+
+.nav-links a i, .nav-links .dropdown-trigger i {
+    width: 20px;
+    text-align: center;
+}
+
+/* Add these styles to your existing CSS file */
+
+.nav-section {
+    margin-bottom: 1rem;
+}
+
+.section-header {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 0.75rem 1.5rem;
+    margin-top: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Make dropdown icons inside sections match the padding */
+.nav-section .dropdown-trigger {
+    padding-left: 1.5rem;
+}
+
+/* Adjust dropdown items padding */
+.reports-dropdown a i {
+    width: 20px;
+    text-align: center;
+    margin-right: 0.5rem;
+}
+
+/* Add hover effect to section headers */
+.section-header:hover {
+    color: white;
+}
+
+.reports-dropdown {
+    max-height: 0px;
+    margin-left: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+    background: rgba(0,0,0,0.1);
+}
+
+.reports-dropdown.active {
+    max-height: calc(100vh - 200px); /* Increased from 600px */
+    overflow-y: auto;
+    padding: 0.75rem 0; /* Increased from 0.5rem */
+}
+
+.reports-dropdown a {
+    padding: 0.75rem 2.5rem; /* Reduced from 1.5rem to create better spacing */
+    font-size: 1rem; /* Increased from 0.9rem */
+    line-height: 1.4; /* Added for better readability */
+}
+
+.reports-dropdown a:hover {
+    background: var(--hover);
+}
+
+.dropdown-caret {
+    transition: transform 0.3s;
+    margin-left: auto;
+}
+
+.dropdown-trigger.active .dropdown-caret {
+    transform: rotate(180deg);
+}
+
+.logout-container {
+    padding: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: white;
+    text-decoration: none;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s;
+    border-radius: 5px;
+}
+
+.logout-btn:hover {
+    background: var(--hover);
+}
+
+.top-bar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    background: white;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 900;
+}
+
+.menu-toggle {
+    color: var(--primary);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.right-menu {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.notification-bell {
+    color: var(--primary);
+    font-size: 1.2rem;
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.3s;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: var(--secondary);
+    color: white;
+    font-size: 0.7rem;
+    padding: 2px 5px;
+    border-radius: 10px;
+    animation: pulse 2s infinite;
+}
+
+.user-profile {
+    position: relative;
+}
+
+.profile-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+}
+
+.profile-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 0.5rem 0;
+    min-width: 200px;
+    margin-top: 0.5rem;
+    z-index: 1000;
+}
+
+.profile-menu.active {
+    display: block;
+}
+
+.profile-menu a {
+    color: var(--dark);
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.profile-menu a:hover {
+    background: #f5f5f5;
+    padding-left: 1.5rem;
+}
+
+.main-content {
+    margin-left: 0;
+    margin-top: 80px;
+    padding: 2rem;
+    width: 100%;
+    transition: margin-left 0.3s ease;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.card-header h2 {
+    color: var(--dark);
+    font-size: 1.2rem;
+}
+
+.card-icon {
+    color: var(--primary);
+    font-size: 1.5rem;
+}
+
+.stat-value {
+    font-size: 2rem;
+    color: var(--dark);
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        left: -100%;
+    }
+    
+    .sidebar.active {
+        left: 0;
+    }
+
+    .main-content {
+        margin-left: 0 !important;
+    }
+}

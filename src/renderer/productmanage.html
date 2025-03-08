@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KashafNoor-Libas - Product Management</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #2c3e50;
+      --secondary-color: #3498db;
+      --accent-color: #e67e22;
+      --light-bg: #f9f9f9;
+      --dark-bg: #2c3e50;
+      --success: #2ecc71;
+      --danger: #e74c3c;
+      --text-color: #333;
+      --border-radius: 8px;
+      --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s ease;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: var(--text-color);
+      background-color: #f5f5f5;
+    }
+    
+    .main-content {
+      padding: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    /* Modal/Popup styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .modal-container {
+      background-color: white;
+      width: 90%;
+      max-width: 1000px;
+      max-height: 90vh;
+      border-radius: var(--border-radius);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      overflow-y: auto;
+      transform: translateY(-20px);
+      transition: transform 0.3s ease;
+    }
+    
+    .modal-overlay.active .modal-container {
+      transform: translateY(0);
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 30px;
+      border-bottom: 1px solid #eee;
+      background-color: var(--secondary-color);
+      color: white;
+      border-radius: 8px 8px 0 0;
+    }
+    
+    .modal-title {
+      font-size: 24px;
+      font-weight: 600;
+    }
+    
+    .close-modal {
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: white;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .close-modal:hover {
+      transform: scale(1.1);
+    }
+    
+    .modal-body {
+      padding: 30px;
+    }
+    
+    /* Delete confirmation modal */
+    .confirm-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.9);
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+      z-index: 1010;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+    }
+    
+    .confirm-modal.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    
+    .confirm-modal h3 {
+      margin-bottom: 15px;
+      color: var(--danger);
+    }
+    
+    .confirm-modal p {
+      margin-bottom: 20px;
+    }
+    
+    .confirm-actions {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+    
+    .confirm-btn, .cancel-confirm-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+    
+    .confirm-btn {
+      background-color: var(--danger);
+      color: white;
+    }
+    
+    .confirm-btn:hover {
+      background-color: #c0392b;
+    }
+    
+    .cancel-confirm-btn {
+      background-color: #95a5a6;
+      color: white;
+    }
+    
+    .cancel-confirm-btn:hover {
+      background-color: #7f8c8d;
+    }
+    
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: var(--primary-color);
+      font-size: 28px;
+      font-weight: 600;
+      position: relative;
+      padding-bottom: 10px;
+    }
+    
+    h2:after {
+      content: '';
+      position: absolute;
+      width: 50px;
+      height: 3px;
+      background-color: var(--secondary-color);
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    
+    .sections-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+    }
+    
+    .form-section {
+      background-color: var(--light-bg);
+      padding: 20px;
+      border-radius: var(--border-radius);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      transition: var(--transition);
+    }
+    
+    .form-section:hover {
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    h3 {
+      margin-bottom: 20px;
+      color: var(--secondary-color);
+      font-size: 20px;
+      font-weight: 500;
+      border-left: 3px solid var(--secondary-color);
+      padding-left: 10px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--primary-color);
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 16px;
+      transition: var(--transition);
+    }
+    
+    .form-control:focus {
+      outline: none;
+      border-color: var(--secondary-color);
+      box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+    }
+    
+    textarea.form-control {
+      min-height: 100px;
+      resize: vertical;
+    }
+    
+    .button-container {
+      grid-column: 1 / -1;
+      text-align: right;
+      margin-top: 30px;
+    }
+    
+    .submit-button {
+      background-color: var(--secondary-color);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .submit-button:hover {
+      background-color: #2980b9;
+      transform: translateY(-2px);
+    }
+    
+    /* Table styles */
+    .products-table-container {
+      background-color: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      padding: 30px;
+      margin-top: 30px;
+      overflow: hidden;
+    }
+    
+    .table-responsive {
+      overflow-x: auto;
+      margin-top: 20px;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background-color: white;
+    }
+    
+    th, td {
+      padding: 15px 20px;
+      text-align: left;
+      border-bottom: 1px solid #eaeaea;
+    }
+    
+    th {
+      background-color: var(--secondary-color);
+      color: white;
+      font-weight: 500;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    
+    th:first-child {
+      border-top-left-radius: 8px;
+    }
+    
+    th:last-child {
+      border-top-right-radius: 8px;
+    }
+    
+    tr:hover {
+      background-color: rgba(52, 152, 219, 0.05);
+    }
+    
+    .action-btns {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .edit-btn, .delete-btn {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: var(--transition);
+    }
+    
+    .edit-btn {
+      background-color: var(--success);
+      color: white;
+    }
+    
+    .edit-btn:hover {
+      background-color: #27ae60;
+      transform: translateY(-2px);
+    }
+    
+    .delete-btn {
+      background-color: var(--danger);
+      color: white;
+    }
+    
+    .delete-btn:hover {
+      background-color: #c0392b;
+      transform: translateY(-2px);
+    }
+    
+    .loader {
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid var(--secondary-color);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+      display: none;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .edit-mode {
+      border: 2px solid var(--secondary-color);
+      background-color: rgba(52, 152, 219, 0.1);
+    }
+    
+    #cancelBtn {
+      background-color: #95a5a6;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-right: 10px;
+      transition: var(--transition);
+    }
+    
+    #cancelBtn:hover {
+      background-color: #7f8c8d;
+      transform: translateY(-2px);
+    }
+    
+    /* Search box styles */
+    .search-container {
+      display: flex;
+      margin-bottom: 25px;
+      align-items: center;
+      position: relative;
+    }
+    
+    .search-box {
+      width: 100%;
+      padding: 14px 20px 14px 50px;
+      border: 2px solid #eaeaea;
+      border-radius: 30px;
+      font-size: 16px;
+      transition: var(--transition);
+      background-color: #f9f9f9;
+    }
+    
+    .search-box:focus {
+      outline: none;
+      border-color: var(--secondary-color);
+      box-shadow: 0 0 10px rgba(52, 152, 219, 0.2);
+      background-color: white;
+    }
+    
+    .search-icon {
+      position: absolute;
+      left: 20px;
+      color: var(--secondary-color);
+      font-size: 18px;
+      pointer-events: none;
+    }
+    
+    .highlight {
+      background-color: rgba(255, 235, 59, 0.4);
+      border-radius: 3px;
+      padding: 2px 0;
+      transition: background-color 0.3s;
+    }
+    
+    .no-results {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--danger);
+      font-size: 18px;
+      display: none;
+      background-color: rgba(231, 76, 60, 0.05);
+      border-radius: 8px;
+      border: 1px solid rgba(231, 76, 60, 0.2);
+    }
+    
+    .no-results i {
+      font-size: 24px;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+    
+    /* Header section */
+    .app-header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      padding: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
+      border-radius: 0 0 12px 12px;
+    }
+    
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .brand {
+      font-size: 24px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .brand i {
+      font-size: 28px;
+    }
+    
+    .nav-actions {
+      display: flex;
+      gap: 15px;
+    }
+    
+    .action-btn {
+      background-color: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: var(--transition);
+    }
+    
+    .action-btn:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+    
+    /* Table pagination */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 25px;
+      gap: 5px;
+    }
+    
+    .pagination-btn {
+      background-color: white;
+      border: 1px solid #ddd;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .pagination-btn:hover, .pagination-btn.active {
+      background-color: var(--secondary-color);
+      color: white;
+      border-color: var(--secondary-color);
+    }
+    
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      background-color: var(--success);
+      color: white;
+      border-radius: 6px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      z-index: 1100;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-20px);
+      transition: all 0.3s ease;
+    }
+    
+    .toast.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    
+    .toast.error {
+      background-color: var(--danger);
+    }
+    
+    /* Responsive adjustments */
+    @media screen and (max-width: 992px) {
+      .sections-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .modal-body {
+        padding: 20px;
+      }
+      
+      .products-table-container {
+        padding: 20px;
+      }
+    }
+    
+    @media screen and (max-width: 768px) {
+      .sections-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      th, td {
+        padding: 12px 15px;
+      }
+      
+      .button-container {
+        text-align: center;
+      }
+      
+      .header-content {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+      }
+      
+      .nav-actions {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+    
+    @media screen and (max-width: 576px) {
+      .modal-body,
+      .products-table-container {
+        padding: 15px;
+        border-radius: 6px;
+      }
+      
+      h2 {
+        font-size: 22px;
+      }
+      
+      h3 {
+        font-size: 18px;
+      }
+      
+      .action-btns {
+        flex-direction: column;
+        gap: 5px;
+      }
+      
+      .edit-btn, .delete-btn {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .pagination {
+        flex-wrap: wrap;
+      }
+    }
+    
+    /* Mobile-friendly table */
+    @media screen and (max-width: 992px) {
+      table {
+        border: 0;
+      }
+      
+      table thead {
+        display: none;
+      }
+      
+      table tr {
+        display: block;
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+      
+      table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 15px;
+        text-align: right;
+        border-bottom: 1px solid #eee;
+      }
+      
+      table td:last-child {
+        border-bottom: 0;
+      }
+      
+      table td:before {
+        content: attr(data-label);
+        font-weight: bold;
+        text-align: left;
+        color: var(--primary-color);
+      }
+      
+      table td.action-cell {
+        justify-content: flex-end;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="main-content" style="margin-top: -20px;">
+  <!-- <header class="app-header">
+    <div class="header-content">
+      <div class="brand">
+        <i class="fas fa-tshirt"></i>
+        KashafNoor-Libas
+      </div>
+      <div class="nav-actions">
+        <button class="action-btn" id="addProductBtn">
+          <i class="fas fa-plus"></i> Add Product
+        </button>
+        <button class="action-btn">
+          <i class="fas fa-file-export"></i> Export
+        </button>
+      </div>
+    </div>
+  </header> -->
+
+  <div class="main-content">
+    <!-- Product Display Section -->
+    <div class="products-table-container">
+      <h2>Product Management</h2>
+      
+      <!-- Search Box -->
+      <div class="search-container">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" id="searchBox" class="search-box" placeholder="Search products by code, name, category...">
+      </div>
+      
+      <div id="noResults" class="no-results">
+        <i class="fas fa-exclamation-circle"></i> No products found matching your search.
+      </div>
+      
+      <div id="loader" class="loader"></div>
+      
+      <div class="table-responsive">
+        <table id="productsTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Product Code</th>
+              <th>Product Name</th>
+              <th>Category</th>
+              <th>Sub Category</th>
+              <th>Company</th>
+              <th>Rack no</th>
+              <th>Supplier</th>
+              <th>Sale Price</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="productsTableBody">
+            <!-- Products will be loaded here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+  <!-- Product Form Modal -->
+  <div class="modal-overlay" id="productFormModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalTitle">Add New Product</h3>
+        <button class="close-modal" id="closeModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="productForm">
+          <input type="hidden" id="productId" name="productId">
+          <div class="sections-grid">
+            <!-- Section 1: Basic Info -->
+            <div class="form-section">
+              <h3>Basic Information</h3>
+              <div class="form-group">
+                <label for="productCode">Product Code</label>
+                <input type="text" id="productCode" name="productCode" class="form-control" 
+                       placeholder="Enter code">
+              </div>
+              <div class="form-group">
+                <label for="productName">Product Name</label>
+                <input type="text" id="productName" name="productName" class="form-control" 
+                       placeholder="Enter name">
+              </div>
+              <div class="form-group">
+                <label for="currentDate">Current Date</label>
+                <input type="date" id="currentDate" name="currentDate" class="form-control">
+              </div>
+            </div>
+
+            <!-- Section 2: Categories -->
+            <div class="form-section">
+              <h3>Categories</h3>
+              <div class="form-group">
+                <label for="category">Category</label>
+                <select id="category" name="category" class="form-control">
+                  <option value="">Select Category</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="subcategory">Subcategory</label>
+                <select id="subcategory" name="subcategory" class="form-control">
+                  <option value="">Select Subcategory</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="rackNo">Rack Number</label>
+                <input type="text" id="rackNo" name="rackNo" class="form-control" 
+                       placeholder="Enter rack no">
+              </div>
+            </div>
+
+            <!-- Section 3: Company Info -->
+            <div class="form-section">
+              <h3>Company Information</h3>
+              <div class="form-group">
+                <label for="companyName">Company Name</label>
+                <select id="companyName" name="companyName" class="form-control">
+                  <option value="">Select Company</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="supplier">Supplier</label>
+                <select id="supplier" name="supplier" class="form-control">
+                  <option value="">Select Supplier</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Section 4: Additional Info -->
+            <div class="form-section">
+              <h3>Additional Information</h3>
+              <div class="form-group">
+                <label for="additionalComment">Additional Comment</label>
+                <textarea id="additionalComment" name="additionalComment" class="form-control" 
+                       placeholder="Enter comments"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="salePrice">Sale Price</label>
+                <input type="number" id="salePrice" name="salePrice" class="form-control" 
+                       step="0.01" placeholder="0.00">
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="button-container">
+              <button type="button" id="cancelBtn">Cancel</button>
+              <button type="submit" class="submit-button" id="submitBtn">Save Product</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="confirm-modal" id="deleteConfirmModal">
+    <h3>Confirm Delete</h3>
+    <p>Are you sure you want to delete this product? This action cannot be undone.</p>
+    <div class="confirm-actions">
+      <button class="cancel-confirm-btn" id="cancelDeleteBtn">Cancel</button>
+      <button class="confirm-btn" id="confirmDeleteBtn">Delete</button>
+    </div>
+  </div>
+
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toastNotification">
+    Operation completed successfully!
+  </div>
+<script src="js/navbar.js"></script>
+
+<script>
+  // API call wrapper
+  async function safeApiCall(apiCall) {
+    try {
+      return await apiCall();
+    } catch (error) {
+      console.error('Error:', error);
+      return null;
+    }
+  }
+
+  let subcategoryArray = [];
+  let editing = false;
+  // Store all products for filtering
+  let allProducts = [];
+  let productToDeleteId = null;
+
+  // Toast notification function
+  function showToast(message, isError = false) {
+    const toast = document.getElementById('toastNotification');
+    toast.textContent = message;
+    
+    if (isError) {
+      toast.classList.add('error');
+    } else {
+      toast.classList.remove('error');
+    }
+    
+    toast.classList.add('active');
+    
+    setTimeout(() => {
+      toast.classList.remove('active');
+    }, 3000);
+  }
+
+  // Open modal function
+  function openModal(title = 'Add New Product') {
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('productFormModal').classList.add('active');
+    document.body.style.overflow = 'hidden'; // Prevent scrolling behind modal
+  }
+
+  // Close modal function
+  function closeModal() {
+    document.getElementById('productFormModal').classList.remove('active');
+    document.body.style.overflow = ''; // Restore scrolling
+    resetForm();
+  }
+
+  // Open delete confirmation modal
+  function openDeleteConfirmation(productId) {
+    productToDeleteId = productId;
+    document.getElementById('deleteConfirmModal').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  // Close delete confirmation modal
+  function closeDeleteConfirmation() {
+    document.getElementById('deleteConfirmModal').classList.remove('active');
+    document.body.style.overflow = '';
+    productToDeleteId = null;
+  }
+
+  // Load categories
+  async function loadCategories() {
+    try {
+      const categories = await safeApiCall(() => window.api.getCategories());
+      const categoryDropdown = document.getElementById('category');
+
+      if (!categories) {
+        console.error('No categories data received');
+        return;
+      }
+
+      categoryDropdown.innerHTML = '<option value="">Select Category</option>'; // Reset options
+
+      categories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category.category_id;
+        option.textContent = category.category_name;
+        categoryDropdown.appendChild(option);
+      });
+
+      console.log('Categories loaded:', categories);
+    } catch (error) {
+      console.error('Error loading categories:', error);
+    }
+  }
+
+  // Load subcategories and populate the array
+  async function loadSubcategories() {
+    try {
+      const subcategories = await safeApiCall(() => window.api.fetchSubcategories());
+      
+      if (!subcategories) {
+        console.error('No subcategories data received');
+        return;
+      }
+      
+      subcategoryArray = subcategories.map(subcategory => ({
+        category_id: subcategory.category_id,
+        subcategory_name: subcategory.subcategory_name
+      }));
+
+      console.log('Subcategories loaded:', subcategoryArray);
+    } catch (error) {
+      console.error('Error loading subcategories:', error);
+    }
+  }
+
+  // Load companies
+  async function loadCompanies() {
+    try {
+      const companies = await safeApiCall(() => window.api.getCompanies());
+      const companyDropdown = document.getElementById('companyName');
+
+      if (!companies) {
+        console.error('No companies data received');
+        return;
+      }
+
+      companyDropdown.innerHTML = '<option value="">Select Company</option>'; // Reset options
+
+      companies.forEach(company => {
+        const option = document.createElement('option');
+        option.value = company.company_id;
+        option.textContent = company.company_name;
+        companyDropdown.appendChild(option);
+      });
+
+      console.log('Companies loaded:', companies);
+    } catch (error) {
+      console.error('Error loading companies:', error);
+    }
+  }
+
+  // Load suppliers
+  async function loadSuppliers() {
+    try {
+      const suppliers = await safeApiCall(() => window.api.getSuppliers());
+      const supplierDropdown = document.getElementById('supplier');
+
+      if (!suppliers) {
+        console.error('No suppliers data received');
+        return;
+      }
+
+      supplierDropdown.innerHTML = '<option value="">Select Supplier</option>'; // Reset options
+
+      suppliers.forEach(supplier => {
+        const option = document.createElement('option');
+        option.value = supplier.supplier_id;
+        option.textContent = supplier.supplier_name;
+        supplierDropdown.appendChild(option);
+      });
+
+      console.log('Suppliers loaded:', suppliers);
+    } catch (error) {
+      console.error('Error loading suppliers:', error);
+    }
+  }
+
+  // Render products to table
+  function renderProducts(products) {
+    const tableBody = document.getElementById('productsTableBody');
+    const noResults = document.getElementById('noResults');
+    
+    tableBody.innerHTML = '';
+    
+    if (!products || products.length === 0) {
+      noResults.style.display = 'block';
+      return;
+    }
+    
+    noResults.style.display = 'none';
+    
+    products.forEach(product => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${product.id}</td>
+        <td>${product.productCode || '-'}</td>
+        <td>${product.productName || '-'}</td>
+        <td>${product.category || '-'}</td>
+        <td>${product.subcategory || '-'}</td>
+        <td>${product.companyName || '-'}</td>
+        <td>${product.rackNo || '-'}</td>
+        <td>${product.supplier || '-'}</td>
+        <td>${product.salePrice ? 'Rs' + parseFloat(product.salePrice).toFixed(2) : '-'}</td>
+        <td class="action-btns">
+          <button class="edit-btn" data-id="${product.id}">Edit</button>
+          <button class="delete-btn" data-id="${product.id}">Delete</button>
+        </td>
+      `;
+      tableBody.appendChild(row);
+    });
+    
+    // Add event listeners for edit and delete buttons
+    document.querySelectorAll('.edit-btn').forEach(button => {
+      button.addEventListener('click', () => editProduct(button.getAttribute('data-id')));
+    });
+    
+    document.querySelectorAll('.delete-btn').forEach(button => {
+      button.addEventListener('click', () => deleteProduct(button.getAttribute('data-id')));
+    });
+  }
+
+  // Load all products
+  async function loadProducts() {
+    try {
+      document.getElementById('loader').style.display = 'block';
+      
+      const products = await safeApiCall(() => window.api.getAllProducts());
+      
+      document.getElementById('loader').style.display = 'none';
+      
+      if (!products || !Array.isArray(products)) {
+        console.error('No products data received or invalid format');
+        return;
+      }
+      
+      // Store all products for filtering
+      allProducts = products;
+      
+      // Render all products initially
+      renderProducts(products);
+      
+      console.log('Products loaded:', products);
+    } catch (error) {
+      document.getElementById('loader').style.display = 'none';
+      console.error('Error loading products:', error);
+    }
+  }
+
+// Search products function
+function searchProducts() {
+  const searchTerm = document.getElementById('searchBox').value.trim().toLowerCase();
+  
+  if (!searchTerm) {
+    // If search is empty, show all products
+    renderProducts(allProducts);
+    return;
+  }
+  
+  // Filter products by product code or product name
+  const filteredProducts = allProducts.filter(product => {
+    // Check product code if it exists
+    const matchesCode = product.productCode && 
+                        product.productCode.toLowerCase().includes(searchTerm);
+    
+    // Check product name if it exists
+    const matchesName = product.productName && 
+                        product.productName.toLowerCase().includes(searchTerm);
+    
+    // Also check category and subcategory
+    const matchesCategory = product.category && 
+                           product.category.toLowerCase().includes(searchTerm);
+    
+    const matchesSubcategory = product.subcategory && 
+                              product.subcategory.toLowerCase().includes(searchTerm);
+    
+    // Return true if any field matches
+    return matchesCode || matchesName || matchesCategory || matchesSubcategory;
+  });
+  
+  // Render filtered products
+  renderProducts(filteredProducts);
+}
+  // Event listener for category change (to filter and load subcategories)
+  document.getElementById('category').addEventListener('change', function() {
+    const categoryId = this.value;
+    const subcategoryDropdown = document.getElementById('subcategory');
+
+    // Reset dropdown
+    subcategoryDropdown.innerHTML = '<option value="">Select Subcategory</option>';
+
+    console.log('Selected category ID:', categoryId);
+
+    if (categoryId && subcategoryArray.length > 0) {
+      // Filter subcategories based on the selected category
+      const filteredSubcategories = subcategoryArray.filter(subcategory => 
+        subcategory.category_id == categoryId
+      );
+
+      console.log('Filtered subcategories:', filteredSubcategories);
+
+      // Populate subcategory dropdown with filtered subcategories
+      filteredSubcategories.forEach(subcategory => {
+        const option = document.createElement('option');
+        option.value = subcategory.subcategory_name;
+        option.textContent = subcategory.subcategory_name;
+        subcategoryDropdown.appendChild(option);
+      });
+    }
+  });
+
+  // Function to select an option by text content
+  function selectOptionByText(selectElement, text) {
+    if (!text) return;
+    
+    for (let i = 0; i < selectElement.options.length; i++) {
+      if (selectElement.options[i].textContent === text) {
+        selectElement.selectedIndex = i;
+        return true;
+      }
+    }
+    return false;
+  }
+
+// Edit product function
+async function editProduct(productId) {
+  try {
+    console.log('Editing product ID:', productId);
+    
+    // Get product data from allProducts array
+    const product = allProducts.find(p => p.id == productId);
+    
+    if (!product) {
+      console.error('Product not found:', productId);
+      showToast('Product not found!', true);
+      return;
+    }
+    
+    console.log('Product data for editing:', product);
+    
+    // Set form to edit mode
+    document.getElementById('modalTitle').textContent = 'Edit Product';
+    document.getElementById('productForm').classList.add('edit-mode');
+    document.getElementById('submitBtn').textContent = 'Update Product';
+    
+    // Set product ID in hidden field
+    document.getElementById('productId').value = product.id;
+    
+    // Set form values
+    document.getElementById('productCode').value = product.productCode || '';
+    document.getElementById('productName').value = product.productName || '';
+    document.getElementById('currentDate').value = product.currentDate || '';
+    document.getElementById('rackNo').value = product.rackNo || '';
+    document.getElementById('additionalComment').value = product.additionalComment || '';
+    document.getElementById('salePrice').value = product.salePrice || '';
+    
+    // Open the modal
+    openModal('Edit Product');
+    
+    // Wait for dropdowns to load then set their values
+    setTimeout(() => {
+      // Select category by text (if any)
+      if (product.category) {
+        const categorySelect = document.getElementById('category');
+        const found = selectOptionByText(categorySelect, product.category);
+        
+        if (found) {
+          // Manually trigger change event to load subcategories
+          const event = new Event('change');
+          categorySelect.dispatchEvent(event);
+          
+          // Set subcategory after a short delay to ensure subcategories are loaded
+          setTimeout(() => {
+            if (product.subcategory) {
+              selectOptionByText(document.getElementById('subcategory'), product.subcategory);
+            }
+          }, 300);
+        }
+      }
+      
+      // Select company by text
+      if (product.companyName) {
+        selectOptionByText(document.getElementById('companyName'), product.companyName);
+      }
+      
+      // Select supplier by text
+      if (product.supplier) {
+        selectOptionByText(document.getElementById('supplier'), product.supplier);
+      }
+    }, 500);
+    
+    // Set editing mode
+    editing = true;
+  } catch (error) {
+    console.error('Error setting up edit form:', error);
+    showToast('Error preparing the edit form. Please try again.', true);
+  }
+}
+
+  // Delete product function
+  async function deleteProduct(productId) {
+  // Store the product ID to delete
+  productToDeleteId = productId;
+  
+  // Open the delete confirmation modal
+  document.getElementById('deleteConfirmModal').classList.add('active');
+  document.body.style.overflow = 'hidden'; // Prevent scrolling behind modal
+}
+
+// Close delete confirmation modal
+function closeDeleteConfirmation() {
+  document.getElementById('deleteConfirmModal').classList.remove('active');
+  document.body.style.overflow = ''; // Restore scrolling
+  productToDeleteId = null;
+}
+
+// Event listeners for delete confirmation modal
+document.getElementById('cancelDeleteBtn').addEventListener('click', closeDeleteConfirmation);
+document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+  if (productToDeleteId) {
+    try {
+      // Show loader while deleting
+      document.getElementById('loader').style.display = 'block';
+      
+      const result = await safeApiCall(() => window.api.deleteProduct(productToDeleteId));
+      
+      document.getElementById('loader').style.display = 'none';
+      
+      if (result && result.success) {
+        showToast('Product deleted successfully!');
+        loadProducts(); // Reload products
+      } else {
+        showToast('Failed to delete product: ' + (result?.message || 'Unknown error'), true);
+      }
+    } catch (error) {
+      document.getElementById('loader').style.display = 'none';
+      console.error('Error deleting product:', error);
+      showToast('Error deleting product. Please try again.', true);
+    }
+    closeDeleteConfirmation();
+  }
+});
+  // Form submission handler
+document.getElementById('productForm').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  
+  // Get selected name (textContent) from dropdowns
+  const categorySelect = document.getElementById('category');
+  const subcategorySelect = document.getElementById('subcategory');
+  const companySelect = document.getElementById('companyName');
+  const supplierSelect = document.getElementById('supplier');
+  
+  const categoryName = categorySelect.options[categorySelect.selectedIndex]?.textContent || '';
+  const subcategoryName = subcategorySelect.options[subcategorySelect.selectedIndex]?.textContent || '';
+  const companyName = companySelect.options[companySelect.selectedIndex]?.textContent || '';
+  const supplierName = supplierSelect.options[supplierSelect.selectedIndex]?.textContent || '';
+  
+  // Construct product data with names instead of IDs
+  const productData = {
+    productCode: document.getElementById('productCode').value,
+    productName: document.getElementById('productName').value,
+    currentDate: document.getElementById('currentDate').value,
+    category: categoryName === 'Select Category' ? '' : categoryName,
+    subcategory: subcategoryName === 'Select Subcategory' ? '' : subcategoryName,
+    companyName: companyName === 'Select Company' ? '' : companyName,
+    rackNo: document.getElementById('rackNo').value,
+    supplier: supplierName === 'Select Supplier' ? '' : supplierName,
+    additionalComment: document.getElementById('additionalComment').value,
+    salePrice: document.getElementById('salePrice').value
+  };
+  
+  console.log('Product data being submitted:', productData);
+  
+  try {
+    let result;
+    
+    if (editing) {
+      const productId = document.getElementById('productId').value;
+      console.log(`Updating product ${productId} with data:`, productData);
+      result = await safeApiCall(() => window.api.updateProduct(productId, productData));
+      
+      if (result && result.success) {
+        showToast('Product updated successfully!');
+        closeModal();
+        loadProducts(); // Reload products
+      } else {
+        console.error('Update product response:', result);
+        showToast('Failed to update product: ' + (result?.message || 'Unknown error'), true);
+      }
+    } else {
+      // Add new product
+      console.log('Adding new product with data:', productData);
+      result = await safeApiCall(() => window.api.addProduct(productData));
+      
+      if (result && result.success) {
+        showToast('Product added successfully!');
+        closeModal();
+        loadProducts(); // Reload products
+      } else {
+        console.error('Add product response:', result);
+        showToast('Failed to add product: ' + (result?.message || 'Unknown error'), true);
+      }
+    }
+  } catch (error) {
+    console.error('Error saving product:', error);
+    showToast('Error saving product. Please check console for details.', true);
+  }
+});
+
+  // Cancel button handler
+
+// Reset form function
+// Modify your resetForm function to include closing the modal:
+// This is the correct implementation for resetForm
+function resetForm() {
+  document.getElementById('productForm').reset();
+  document.getElementById('productId').value = '';
+  document.getElementById('modalTitle').textContent = 'Add New Product';
+  document.getElementById('productForm').classList.remove('edit-mode');
+  document.getElementById('submitBtn').textContent = 'Save Product';
+  editing = false;
+}
+
+// Define closeModal separately - make sure it's not nested in resetForm
+function closeModal() {
+  document.getElementById('productFormModal').classList.remove('active');
+  document.body.style.overflow = ''; // Restore scrolling
+  resetForm();
+}
+
+// Then in your event listeners, make sure to use closeModal directly:
+document.getElementById('closeModal').addEventListener('click', closeModal);
+document.getElementById('cancelBtn').addEventListener('click', closeModal);
+
+// Then in your DOMContentLoaded event handler:
+document.addEventListener('DOMContentLoaded', () => {
+  // Load data and set up the application
+  loadCategories();
+  loadSubcategories();
+  loadCompanies();
+  loadSuppliers();
+  loadProducts();
+  setCurrentDate();
+  
+  // Add event listener for search
+  const searchBox = document.getElementById('searchBox');
+  searchBox.addEventListener('input', searchProducts);
+  
+  // Set up modal event listeners
+  document.getElementById('addProductBtn').addEventListener('click', () => {
+    openModal('Add New Product');
+  });
+  
+  document.getElementById('closeModal').addEventListener('click', resetForm);
+  document.getElementById('cancelBtn').addEventListener('click', resetForm);
+  
+  // Delete confirmation modal buttons
+  document.getElementById('cancelDeleteBtn').addEventListener('click', closeDeleteConfirmation);
+  document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+    if (productToDeleteId) {
+      try {
+        const result = await safeApiCall(() => window.api.deleteProduct(productToDeleteId));
+        
+        if (result && result.success) {
+          showToast('Product deleted successfully!');
+          loadProducts(); // Reload products
+        } else {
+          showToast('Failed to delete product: ' + (result?.message || 'Unknown error'), true);
+        }
+      } catch (error) {
+        console.error('Error deleting product:', error);
+        showToast('Error deleting product. Please try again.', true);
+      }
+      closeDeleteConfirmation();
+    }
+  });
+});
+
+// Remove this duplicate event listener that appears earlier in your code:
+// document.getElementById('cancelBtn').addEventListener('click', () => {
+//   resetForm();
+// });
+
+  // Set current date on page load
+  function setCurrentDate() {
+    const currentDate = new Date();
+    const formattedDate = currentDate.toISOString().split('T')[0];
+    document.getElementById('currentDate').value = formattedDate;
+  }
+
+// Initialize the page
+
+</script>
+
+</body>
+</html>

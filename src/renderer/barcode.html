@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barcode Generator</title>
+    <!-- Use CDN for JsBarcode -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.5/JsBarcode.all.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --success-color: #4cc9f0;
+            --border-color: #e0e0e0;
+            --light-bg: #f8f9fa;
+            --dark-text: #333;
+            --light-text: #666;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f7fa;
+            color: var(--dark-text);
+        }
+        
+        .container {
+            border: 1px solid var(--border-color);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            background-color: white;
+        }
+        
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+            margin-right: 5px;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .tab:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+        
+        .tab.active {
+            background-color: white;
+            border-bottom: 2px solid white;
+            color: var(--primary-color);
+            position: relative;
+            top: 1px;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 15px 5px;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark-text);
+        }
+        
+        input {
+            padding: 12px;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+        }
+        
+        button {
+            padding: 12px;
+            width: 100%;
+            box-sizing: border-box;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            margin-top: 15px;
+            transition: all 0.2s;
+        }
+        
+        button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .barcode-output {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: white;
+        }
+        
+        .barcode-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 25px;
+            padding: 15px;
+            border-bottom: 1px dashed #ccc;
+            transition: all 0.2s;
+        }
+        
+        .barcode-container:hover {
+            background-color: var(--light-bg);
+        }
+        
+        .barcode-container:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .barcode-text {
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--dark-text);
+        }
+        
+        .error {
+            color: #e63946;
+            font-weight: 500;
+            padding: 12px;
+            background-color: rgba(230, 57, 70, 0.1);
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        
+        .success {
+            color: #2a9d8f;
+            font-weight: 500;
+            padding: 12px;
+            background-color: rgba(42, 157, 143, 0.1);
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        
+        .info {
+            color: #4361ee;
+            font-weight: 500;
+            padding: 12px;
+            background-color: rgba(67, 97, 238, 0.1);
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        
+        .print-button {
+            margin-top: 20px;
+            background-color: var(--success-color);
+        }
+        
+        .print-button:hover {
+            background-color: #3bacda;
+        }
+        
+        .status-indicator {
+            font-size: 14px;
+            color: var(--light-text);
+            text-align: center;
+            margin-top: 15px;
+        }
+        
+        /* Animation for generating barcodes */
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+        
+        .generating {
+            animation: pulse 1.5s infinite;
+        }
+        
+        /* Hide iframe used for printing */
+        iframe#printjs {
+            visibility: hidden;
+            height: 0;
+            width: 0;
+            position: absolute;
+        }
+        
+        /* Print styles moved to JS for iframe printing */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            iframe#printjs {
+                visibility: visible;
+                position: absolute;
+                left: 0;
+                top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+<main class="main-content">
+    <div class="container">
+        <h1>Barcode Generator</h1>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="sequential">Sequential Series</div>
+            <div class="tab" data-tab="custom">Custom Barcode</div>
+        </div>
+        
+        <div id="status-message"></div>
+        
+        <div id="sequential-tab" class="tab-content active">
+            <div class="form-group">
+                <label for="start-barcode">Starting Barcode:</label>
+                <input type="text" id="start-barcode" placeholder="A000001" value="A000001">
+            </div>
+            
+            <div class="form-group">
+                <label for="quantity">Number of Barcodes:</label>
+                <input type="number" id="quantity" min="1" max="100" value="1">
+            </div>
+            
+            <button id="generate-sequential">Generate Barcodes</button>
+        </div>
+        
+        <div id="custom-tab" class="tab-content">
+            <div class="form-group">
+                <label for="custom-barcode">Enter Barcode Number:</label>
+                <input type="text" id="custom-barcode" placeholder="Enter barcode number">
+            </div>
+            
+            <div class="form-group">
+                <label for="custom-quantity">Number of Barcodes:</label>
+                <input type="number" id="custom-quantity" min="1" max="100" value="1">
+            </div>
+            
+            <button id="generate-custom">Generate Barcodes</button>
+        </div>
+        
+        <div id="barcode-output" class="barcode-output" style="display: none;">
+            <!-- Barcodes will be inserted here -->
+        </div>
+        
+        <button id="print-button" class="print-button" style="display: none;">Print Barcodes</button>
+        
+        <div id="status-indicator" class="status-indicator"></div>
+    </div>
+</main>
+<script src="js/navbar.js"></script>
+    <script>
+        // Global object to store api methods for frontend-backend communication
+        window.api = window.api || {};
+        
+        // Define API methods for database operations (will be replaced in Electron)
+        window.api.getLastBarcode = async function() {
+            try {
+                // This is a placeholder that will be replaced by actual implementation
+                // For standalone HTML, we'll use localStorage as a fallback
+                return localStorage.getItem('last_barcode') || 'A000001';
+            } catch (error) {
+                console.error('Error getting last barcode:', error);
+                return 'A000001'; // Default fallback
+            }
+        };
+        
+        window.api.saveLastBarcode = async function(barcode) {
+            try {
+                // This is a placeholder that will be replaced by actual implementation
+                // For standalone HTML, we'll use localStorage as a fallback
+                localStorage.setItem('last_barcode', barcode);
+                return true;
+            } catch (error) {
+                console.error('Error saving last barcode:', error);
+                return false;
+            }
+        };
+        
+        // Tab functionality
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.getAttribute('data-tab');
+                
+                // Remove active class from all tabs and contents
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                // Add active class to current tab and content
+                tab.classList.add('active');
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+            });
+        });
+        
+        // Get DOM elements
+        const startBarcodeInput = document.getElementById('start-barcode');
+        const quantityInput = document.getElementById('quantity');
+        const generateSequentialButton = document.getElementById('generate-sequential');
+        
+        const customBarcodeInput = document.getElementById('custom-barcode');
+        const customQuantityInput = document.getElementById('custom-quantity');
+        const generateCustomButton = document.getElementById('generate-custom');
+        
+        const barcodeOutput = document.getElementById('barcode-output');
+        const printButton = document.getElementById('print-button');
+        const statusMessage = document.getElementById('status-message');
+        const statusIndicator = document.getElementById('status-indicator');
+        
+        // Function to show status message
+        function showStatusMessage(message, type = 'error') {
+            statusMessage.innerHTML = `<div class="${type}">${message}</div>`;
+            setTimeout(() => {
+                statusMessage.innerHTML = '';
+            }, 5000);
+        }
+        
+        // Function to update status indicator
+        function updateStatusIndicator(message) {
+            statusIndicator.textContent = message;
+        }
+        
+        // Function to increment barcode
+        function incrementBarcode(barcode, increment = 1) {
+            // Extract the prefix (letters) and numeric part
+            const prefix = barcode.replace(/[0-9]/g, '');
+            const number = parseInt(barcode.replace(/[^0-9]/g, '') || '0');
+            
+            // Increment the number
+            const newNumber = number + increment;
+            
+            // Determine the number of digits in the original barcode
+            const numDigits = barcode.length - prefix.length;
+            
+            // Create the new barcode with the same number of digits
+            return prefix + newNumber.toString().padStart(numDigits, '0');
+        }
+        
+      // Function to generate multiple barcodes
+async function generateBarcodes(startBarcode, quantity, isSequential = true) {
+    let barcodes = [];
+    let currentBarcode = startBarcode;
+    
+    for (let i = 0; i < quantity; i++) {
+        barcodes.push(currentBarcode);
+        // Only increment the barcode if we're in sequential mode
+        if (isSequential) {
+            currentBarcode = incrementBarcode(currentBarcode);
+        }
+        // If not sequential (custom mode), we keep using the same barcode
+    }
+    
+    // If sequential, update the start barcode input with the last barcode + 1
+    // and save the last barcode
+    if (isSequential && barcodes.length > 0) {
+        const lastBarcode = barcodes[barcodes.length - 1];
+        const nextBarcode = incrementBarcode(lastBarcode);
+        startBarcodeInput.value = nextBarcode;
+        
+        try {
+            // Save the last barcode
+            const saved = await window.api.saveLastBarcode(lastBarcode);
+            if (saved) {
+                updateStatusIndicator(`Last barcode saved: ${lastBarcode}`);
+            }
+        } catch (error) {
+            console.error('Error saving barcode:', error);
+            showStatusMessage('Error saving last barcode to database', 'error');
+        }
+    }
+    
+    return barcodes;
+}
+        // Function to render barcodes
+        function renderBarcodes(barcodes) {
+            // Clear previous content
+            barcodeOutput.innerHTML = '';
+            
+            if (barcodes.length === 0) {
+                showStatusMessage("No barcodes to display", "error");
+                return;
+            }
+            
+            // Create a container for each barcode
+            barcodes.forEach(barcode => {
+                const container = document.createElement('div');
+                container.className = 'barcode-container';
+                
+                // Create SVG element
+                const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                
+                // Generate barcode - now showing display value on screen
+                try {
+                    JsBarcode(svg, barcode, {
+                        format: "CODE128",
+                        width: 2,
+                        height: 80,
+                        displayValue: true, // Changed to true to display the value on screen
+                        margin: 10,
+                        background: "#ffffff",
+                        fontSize: 14
+                    });
+                    
+                    // Add to container
+                    container.appendChild(svg);
+                    
+                    // Add barcode text explicitly below the SVG
+                    const barcodeText = document.createElement('div');
+                    barcodeText.className = 'barcode-text';
+                    barcodeText.textContent = barcode;
+                    container.appendChild(barcodeText);
+                    
+                    barcodeOutput.appendChild(container);
+                } catch (error) {
+                    showStatusMessage("Error generating barcode: " + (error.message || "Invalid input"), "error");
+                    return;
+                }
+            });
+            
+            // Show the output and print button
+            barcodeOutput.style.display = 'block';
+            printButton.style.display = 'block';
+            
+            // Show success message
+            showStatusMessage(`Generated ${barcodes.length} barcodes successfully!`, "success");
+        }
+        
+        // Initialize with the last barcode
+        window.addEventListener('load', async function() {
+            try {
+                updateStatusIndicator('Loading last barcode...');
+                const lastBarcode = await window.api.getLastBarcode();
+                if (lastBarcode) {
+                    startBarcodeInput.value = incrementBarcode(lastBarcode);
+                    updateStatusIndicator(`Last used barcode: ${lastBarcode}`);
+                } else {
+                    startBarcodeInput.value = 'A000001'; // Default
+                    updateStatusIndicator('Using default starting barcode');
+                }
+            } catch (error) {
+                console.error('Error initializing:', error);
+                startBarcodeInput.value = 'A000001'; // Default fallback
+                updateStatusIndicator('Error loading last barcode');
+            }
+        });
+        
+        // Handle generate button click for sequential tab
+        generateSequentialButton.addEventListener('click', async function() {
+            const startBarcode = startBarcodeInput.value.trim();
+            const quantity = parseInt(quantityInput.value);
+            
+            if (!startBarcode) {
+                showStatusMessage("Please enter a starting barcode", "error");
+                return;
+            }
+            
+            if (isNaN(quantity) || quantity <= 0 || quantity > 100) {
+                showStatusMessage("Please enter a valid quantity (1-100)", "error");
+                return;
+            }
+            
+            // Show loading state
+            generateSequentialButton.textContent = 'Generating...';
+            generateSequentialButton.disabled = true;
+            
+            try {
+                const barcodes = await generateBarcodes(startBarcode, quantity, true);
+                renderBarcodes(barcodes);
+            } catch (error) {
+                showStatusMessage("Error generating barcodes: " + error.message, "error");
+            } finally {
+                // Reset button state
+                generateSequentialButton.textContent = 'Generate Barcodes';
+                generateSequentialButton.disabled = false;
+            }
+        });
+        
+        // Handle generate button click for custom tab
+        generateCustomButton.addEventListener('click', async function() {
+            const customBarcode = customBarcodeInput.value.trim();
+            const quantity = parseInt(customQuantityInput.value);
+            
+            if (!customBarcode) {
+                showStatusMessage("Please enter a barcode number", "error");
+                return;
+            }
+            
+            if (isNaN(quantity) || quantity <= 0 || quantity > 100) {
+                showStatusMessage("Please enter a valid quantity (1-100)", "error");
+                return;
+            }
+            
+            // Show loading state
+            generateCustomButton.textContent = 'Generating...';
+            generateCustomButton.disabled = true;
+            
+            try {
+                const barcodes = await generateBarcodes(customBarcode, quantity, false);
+                renderBarcodes(barcodes);
+            } catch (error) {
+                showStatusMessage("Error generating barcodes: " + error.message, "error");
+            } finally {
+                // Reset button state
+                generateCustomButton.textContent = 'Generate Barcodes';
+                generateCustomButton.disabled = false;
+            }
+        });
+        
+        // Improved function for printing using iframe approach
+       // Improved function for printing using iframe approach
+function printBarcodes() {
+    // Show printing status
+    showStatusMessage("Preparing barcodes for printing...", "info");
+    printButton.textContent = "Preparing to print...";
+    printButton.disabled = true;
+    
+    // Remove any existing print frame
+    const existingFrame = document.getElementById('printjs');
+    if (existingFrame) {
+        document.body.removeChild(existingFrame);
+    }
+    
+    // Create a new iframe for printing
+    const printFrame = document.createElement('iframe');
+    printFrame.setAttribute('id', 'printjs');
+    printFrame.setAttribute('style', 'visibility: hidden; height: 0; width: 0; position: absolute;');
+    
+    // Get the barcodes content
+    const printableElement = document.getElementById('barcode-output');
+    const barcodeContainers = printableElement.querySelectorAll('.barcode-container');
+    
+    // Create the content for the iframe with exact label size styling
+    printFrame.srcdoc = `
+        <html>
+        <head>
+            <title>Barcode Print</title>
+            <style>
+                @page {
+                    size: 1.97in 0.98in;
+                    margin: 0;
+                }
+                body {
+                    margin: 0;
+                    padding: 0;
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                }
+                .barcode-label {
+                    width: 1.97in;
+                    height: 0.98in;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    page-break-after: always;
+                    position: relative;
+                    box-sizing: border-box;
+                    padding: 0.1in;
+                }
+                svg {
+                    max-width: 100%;
+                    max-height: 85%;
+                }
+                .barcode-text {
+                    text-align: center;
+                    font-size: 10px;
+                    font-weight: 500;
+                    margin-top: 5px;
+                }
+            </style>
+        </head>
+        <body>
+    `;
+    
+    // Add each barcode as a separate page with text
+    barcodeContainers.forEach((container) => {
+        const svg = container.querySelector('svg');
+        const textElement = container.querySelector('.barcode-text');
+        const barcodeText = textElement ? textElement.textContent : '';
+        
+        printFrame.srcdoc += `
+            <div class="barcode-label">
+                ${svg.outerHTML}
+                <div class="barcode-text">${barcodeText}</div>
+            </div>
+        `;
+    });
+    
+    printFrame.srcdoc += `
+        </body>
+        </html>
+    `;
+    
+    // Add to document, focus, and print
+    document.body.appendChild(printFrame);
+    
+    // Wait for iframe to load before printing
+    printFrame.onload = function() {
+        try {
+            showStatusMessage("Sending to printer...", "info");
+            printButton.textContent = "Printing...";
+            
+            // Add event listener for afterprint event
+            window.addEventListener('afterprint', function onAfterPrint() {
+                printButton.textContent = "Print Barcodes";
+                printButton.disabled = false;
+                showStatusMessage("Printing complete!", "success");
+                window.removeEventListener('afterprint', onAfterPrint);
+            }, {once: true});
+            
+            // Set a fallback in case afterprint doesn't fire
+            setTimeout(function() {
+                if (printButton.textContent === "Printing...") {
+                    printButton.textContent = "Print Barcodes";
+                    printButton.disabled = false;
+                    showStatusMessage("Printing completed", "success");
+                }
+            }, 5000);
+            
+            printFrame.contentWindow.focus();
+            printFrame.contentWindow.print();
+        } catch (error) {
+            console.error('Error during printing:', error);
+            showStatusMessage('Error during printing. Please try again.', 'error');
+            printButton.textContent = "Print Barcodes";
+            printButton.disabled = false;
+        }
+    };
+}
+        
+        // Handle print button click with new method
+        printButton.addEventListener('click', printBarcodes);
+    </script>
+    </body>
+    </html>

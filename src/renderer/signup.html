@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline';">
+    <title>Signup</title>
+    <style>
+        /* Add styles for the eye icon */
+        .password-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        
+        .password-container input {
+            flex: 1;
+        }
+        
+        .eye-icon {
+            position: absolute;
+            right: 10px;
+            cursor: pointer;
+            user-select: none;
+            font-size: 1.2em;
+        }
+
+        /* Add styles for the select dropdown */
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+    <link rel="stylesheet" href="style/signup.css">
+</head>
+<body>
+    <div class="split-container">
+        <div class="image-section">
+            <div class="logo-container">
+                <img src="../img/logo.jpeg" alt="Logo">
+            </div>
+        </div>
+        <div class="form-section">
+            <div class="success-checkmark" id="successCheckmark">
+                <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                    <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+                    <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                </svg>
+            </div>
+            <div class="signup-container">
+                <h1>Create Account</h1>
+                <form id="signupForm">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="password-container">
+                            <input type="password" id="password" name="password" required />
+                            <span id="togglePassword" class="eye-icon">&#128065;</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="actorType">Role</label>
+                        <select id="actorType" name="actorType" required>
+                            <option value="">Select Role</option>
+                            <option value="admin">Admin</option>
+                            <option value="salesperson">Salesperson</option>
+                        </select>
+                    </div>
+                    <button type="submit">Sign Up</button>
+                </form>
+                <div class="login-link">
+                    <p>Already have an account? <a href="login.html">Login here</a></p>
+                </div>
+                <p id="message"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('signupForm');
+            const message = document.getElementById('message');
+            const successCheckmark = document.getElementById('successCheckmark');
+            const signupContainer = document.querySelector('.signup-container');
+
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                const username = form.username.value;
+                const email = form.email.value;
+                const password = form.password.value;
+                const actorType = form.actorType.value;
+
+                if (!username || !email || !password || !actorType) {
+                    message.style.color = '#ff3333';
+                    message.textContent = 'Please fill in all fields';
+                    form.classList.add('shake');
+                    setTimeout(() => form.classList.remove('shake'), 500);
+                    return;
+                }
+
+                try {
+                    const result = await window.api.addUser({ username, email, password, actorType });
+
+                    if (result.success) {
+                        signupContainer.style.opacity = '0';
+                        
+                        setTimeout(() => {
+                            successCheckmark.classList.add('show');
+                        }, 300);
+
+                        setTimeout(() => {
+                            window.location.href = 'login.html';
+                        }, 2000);
+                    } else {
+                        message.style.color = '#ff3333';
+                        message.textContent = `Signup failed: ${result.error}`;
+                        form.classList.add('shake');
+                        setTimeout(() => form.classList.remove('shake'), 500);
+                    }
+                } catch (error) {
+                    message.style.color = '#ff3333';
+                    message.textContent = `Error: ${error.message}`;
+                    form.classList.add('shake');
+                    setTimeout(() => form.classList.remove('shake'), 500);
+                }
+            });
+        });
+
+        const togglePassword = document.getElementById("togglePassword");
+        const passwordField = document.getElementById("password");
+
+        togglePassword.addEventListener("click", () => {
+            const type = passwordField.getAttribute("type") === "password" ? "text" : "password";
+            passwordField.setAttribute("type", type);
+            togglePassword.textContent = type === "password" ? "👁️" : "🔒";
+        });
+    </script>
+</body>
+</html>

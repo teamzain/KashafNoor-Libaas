@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KashafNoor-Libas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="style/main.css">
+</head>
+<body>
+    <!-- Loader and Overlay -->
+    <div id="overlay" class="overlay"></div>
+    <div id="loader" class="loader"></div>
+
+    <!-- Error Modal -->
+    <div id="errorModal" class="modal">
+        <div class="modal-content">
+            <h3>Error</h3>
+            <p id="errorMessage"></p>
+            <button onclick="closeErrorModal()" class="btn btn-primary">Close</button>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteConfirmModal" class="modal">
+        <div class="modal-content">
+            <h3>Confirm Deletion</h3>
+            <p id="deleteConfirmMessage">Are you sure you want to delete this item?</p>
+            <div class="modal-footer">
+                <button id="confirmDeleteBtn" class="btn btn-delete">Delete</button>
+                <button id="cancelDeleteBtn" class="btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supplier Modal -->
+    <div id="supplierModal" class="modal">
+        <div class="modal-content">
+            <h2 id="supplierModalTitle">Add Supplier</h2>
+            <form id="supplierForm">
+                <div class="form-group">
+                    <label for="supplierName">Supplier Name</label>
+                    <input type="text" id="supplierName" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <input type="text" id="address" required>
+                </div>
+                <div class="form-group">
+                    <label for="phoneNumber">Phone Number</label>
+                    <input type="tel" id="phoneNumber" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="saveSupplier" class="btn btn-primary">Save</button>
+                    <button type="button" id="cancelSupplier" class="btn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <div id="categoryModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Add Category</h2>
+            <form id="categoryForm">
+                <div class="form-group">
+                    <label for="categoryName">Category Name</label>
+                    <input type="text" id="categoryName" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" id="cancelBtn" class="btn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    
+<div id="subcategoryModal" class="modal">
+    <div class="modal-content">
+        <h2>Add Subcategory</h2>
+        <form id="subcategoryForm">
+            <div class="form-group">
+                <label for="subcategoryCategoryId">Category ID</label>
+                <input type="text" id="subcategoryCategoryId" readonly required>
+            </div>
+            <div class="form-group">
+                <label for="subcategoryName">Subcategory Name</label>
+                <input type="text" id="subcategoryName" required>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="button" id="subcategoryCancelBtn" class="btn">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+<div id="companyModal" class="modal">
+    <div class="modal-content">
+        <h2 id="formTitle">Add Company</h2>
+        <form id="companyForm">
+            <div class="form-group">
+                <label for="companyName">Company Name</label>
+                <input type="text" id="companyName" required>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="button" id="cancelCompanyBtn" class="btn">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<main class="main-content">
+    <!-- Main Application Container -->
+    <div class="app-container">
+       
+            <div class="header">
+                <h1>Product Setup</h1>
+            </div>
+
+            <!-- Horizontal Tab Navigation -->
+            <div class="tab-navigation">
+                <button class="tab-btn active" data-tab="suppliers">
+                    <i class="fas fa-truck"></i> Suppliers
+                </button>
+              
+                <button class="tab-btn" data-tab="categories">
+                    <i class="fas fa-tags"></i> Categories
+                </button>
+                <button class="tab-btn" data-tab="companies">
+                    <i class="fas fa-building"></i> Companies
+                </button>
+                <button onclick="window.location.href='subcategory.html'" class="btn btn-primary">
+                    <i class="fas fa-eye"></i> Show Subcategories
+                </button>
+            </div>
+            
+            <!-- Tab Content -->
+            <div class="tab-content">
+                <div id="companies" class="tab-pane">
+                    <div class="card">
+                        <div class="content-header">
+                            <button id="addCompanyBtn" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Add Company
+                            </button>
+                        </div>
+                
+                        <div class="search-container">
+                            <input type="text" id="companySearchField" placeholder="Search companies..." onkeyup="filterCompanies()">
+                        </div>
+                
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Company ID</th>
+                                        <th>Company Name</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="companyTableBody">
+                                    <!-- Companies will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div id="categories" class="tab-pane">
+                    <div class="card">
+                        <div class="content-header">
+                            <button id="addCategoryBtn" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Add Category
+                            </button>
+                        </div>
+                
+                        <div class="search-container">
+                            <input type="text" id="searchField" placeholder="Search categories..." onkeyup="filterCategories()">
+                        </div>
+                
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Category ID</th>
+                                        <th>Category Name</th>
+                                        <th>Created At</th>
+                                        <th>Sub-Category ID</th>
+                                        <th>Sub-Category Name</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="categoryTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+ 
+                <div id="suppliers" class="tab-pane active">
+                    <div class="card">
+                        <div class="content-header">
+                            <button id="addSupplierBtn" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Add Supplier
+                            </button>
+                        </div>
+
+                        <div class="search-container">
+                            <input type="text" id="supplierSearchField" placeholder="Search suppliers..." onkeyup="filterSuppliers()">
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Supplier ID</th>
+                                        <th>Supplier Name</th>
+                                        <th>Email</th>
+                                        <th>Address</th>
+                                        <th>Phone Number</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="supplierTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+              
+
+                <!-- Line Items Tab -->
+                
+</div>
+
+    </div>
+</main>
+    <script src="js/navbar.js"></script>
+    <!-- Scripts -->
+    <script src="js/main.js"></script>
+    <script src="js/suppliers.js"></script>
+  
+    <script src="js/categories.js"></script>
+    <script src="js/companies.js"></script>
+</body>
+</html>

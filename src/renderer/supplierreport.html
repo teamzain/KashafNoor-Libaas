@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dispenso - Customer Report</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+     <style>
+        /* Main Styles for Customer Report */
+
+/* Variables */
+:root {
+  --primary-color: #3A4F48;
+  --primary-dark: #3A4F48;
+  --secondary-color: #6c757d;
+  --success-color: #28a745;
+  --warning-color: #ffc107;
+  --danger-color: #dc3545;
+  --info-color: #3A4F48;
+  --light-color: #f8f9fa;
+  --dark-color: #343a40;
+  --white: #ffffff;
+  --black: #000000;
+  --border-color: #dee2e6;
+  --box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+/* General styles */
+/* body {
+  font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.5;
+  color: var(--dark-color);
+  background-color: #f5f7f9;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+} */
+
+/* Main content area */
+.main-content {
+  padding: 1.5rem;
+  /* margin-left: 250px; */
+  transition: margin-left 0.3s ease;
+}
+
+@media (max-width: 992px) {
+  .main-content {
+    margin-left: 0;
+  }
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Cards */
+.card {
+  background-color: var(--white);
+  border-radius: 0.5rem;
+  box-shadow: var(--box-shadow);
+  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+  transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+}
+
+/* Report Header */
+.report-header {
+  margin-bottom: 1.5rem;
+}
+
+.report-header h1 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--dark-color);
+}
+
+.report-header p {
+  color: var(--secondary-color);
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Report Filters */
+.report-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.filter-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .filter-section {
+    flex-direction: column;
+  }
+}
+
+.customer-search-container,
+.date-range-container {
+  flex: 1;
+  min-width: 250px;
+}
+
+.date-range-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.date-inputs {
+  display: flex;
+  gap: 1rem;
+}
+
+@media (max-width: 576px) {
+  .date-inputs {
+    flex-direction: column;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+label {
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+  color: var(--dark-color);
+  font-weight: 500;
+}
+
+input[type="text"],
+input[type="date"] {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  width: 100%;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input[type="text"]:focus,
+input[type="date"]:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+  outline: none;
+}
+
+.date-shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.btn {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  border-radius: 0.25rem;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+  transition: color 0.15s, background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
+  border: 1px solid transparent;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: var(--white);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-dark);
+}
+
+.btn-secondary {
+  background-color: var(--secondary-color);
+  color: var(--white);
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+.date-btn {
+  background-color: #e9ecef;
+  color: var(--dark-color);
+  border: 1px solid #ced4da;
+}
+
+.date-btn:hover {
+  background-color: #dde2e6;
+}
+
+.date-btn.active {
+  background-color: var(--primary-color);
+  color: var(--white);
+  border-color: var(--primary-color);
+}
+
+.filter-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* Autocomplete */
+.autocomplete-wrapper {
+  position: relative;
+}
+
+.autocomplete-suggestions {
+  position: absolute;
+  z-index: 1000;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 0.25rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  display: none;
+}
+
+.suggestion-item {
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+}
+
+.suggestion-item:hover {
+  background-color: #f8f9fa;
+}
+
+/* Report Summary */
+.report-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.summary-item {
+  flex: 1;
+  min-width: 200px;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: rgba(74, 144, 226, 0.05);
+  border-left: 4px solid var(--primary-color);
+}
+
+.summary-label {
+  font-size: 0.875rem;
+  color: var(--secondary-color);
+  margin-bottom: 0.5rem;
+}
+
+.summary-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--dark-color);
+}
+
+/* Report Details */
+.table-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.search-container {
+  position: relative;
+  width: 300px;
+  max-width: 100%;
+}
+
+.search-container input {
+  padding-left: 2.5rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236c757d' width='18px' height='18px'%3E%3Cpath d='M0 0h24v24H0V0z' fill='none'/%3E%3Cpath d='M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 0.75rem center;
+}
+
+.export-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.export-actions .btn {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.export-actions .btn i {
+  font-size: 0.875rem;
+}
+
+/* Responsive Table */
+.table-responsive {
+  overflow-x: auto;
+}
+
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.report-table th,
+.report-table td {
+  padding: 0.75rem;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.report-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: var(--dark-color);
+  border-bottom: 2px solid var(--border-color);
+}
+
+.report-table td {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.report-table tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.report-table tfoot {
+  font-weight: 600;
+}
+
+.report-table tfoot tr td {
+  border-top: 2px solid var(--border-color);
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 0.25rem;
+}
+
+.badge-success {
+  background-color: rgba(40, 167, 69, 0.1);
+  color: var(--success-color);
+}
+
+.badge-warning {
+  background-color: rgba(255, 193, 7, 0.1);
+  color: #b88500;
+}
+
+/* Action Buttons */
+.action-btn {
+  padding: 0.25rem 0.5rem;
+  background-color: transparent;
+  border: none;
+  color: var(--secondary-color);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.action-btn:hover {
+  color: var(--primary-color);
+}
+/* Pagination styles */
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.pagination-numbers {
+    display: flex;
+    margin: 0 10px;
+}
+
+.page-number {
+    background-color: white;
+    border: 1px solid #ddd;
+    color: #333;
+    padding: 5px 10px;
+    margin: 0 2px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.2s;
+}
+
+.page-number:hover {
+    background-color: #f0f0f0;
+}
+
+.page-number.active {
+    background-color: #4a90e2;
+    color: white;
+    border-color: #4a90e2;
+}
+
+.page-ellipsis {
+    padding: 5px 8px;
+    margin: 0 2px;
+}
+
+#prevPage, #nextPage {
+    background-color: white;
+    border: 1px solid #ddd;
+    color: #333;
+    padding: 5px 12px;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.2s;
+}
+
+#prevPage:hover, #nextPage:hover {
+    background-color: #f0f0f0;
+}
+
+#prevPage:disabled, #nextPage:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#pageInfo {
+    margin: 0 10px;
+    font-size: 14px;
+    color: #666;
+}
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1050;
+  overflow-y: auto;
+  animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-content {
+  position: relative;
+  margin: 1.5rem auto;
+  width: 90%;
+  max-width: 900px;
+  background-color: var(--white);
+  border-radius: 0.5rem;
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.2);
+  animation: slideIn 0.3s;
+}
+
+@keyframes slideIn {
+  from { transform: translateY(-50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.transaction-modal {
+  width: 90%;
+  max-width: 900px;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.close-btn {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--secondary-color);
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  color: var(--dark-color);
+}
+
+.modal-body {
+  padding: 1.25rem;
+}
+
+.transaction-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.transaction-info,
+.transaction-details {
+  flex: 1;
+  min-width: 250px;
+}
+
+.transaction-info p,
+.transaction-details p {
+  margin: 0.5rem 0;
+}
+
+.products-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+}
+
+.products-table th,
+.products-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.products-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+}
+
+.transaction-summary {
+  width: 100%;
+  max-width: 400px;
+  margin-left: auto;
+  margin-top: 1.5rem;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+}
+
+.total-row {
+  font-weight: 600;
+  font-size: 1.1rem;
+  border-top: 1px solid var(--border-color);
+  padding-top: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.comments-section {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.comments-section h4 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 1.25rem;
+  border-top: 1px solid var(--border-color);
+  gap: 0.75rem;
+}
+
+/* Loading Spinner */
+.loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.loading-spinner {
+  width: 3rem;
+  height: 3rem;
+  border: 0.25rem solid rgba(0, 0, 0, 0.1);
+  border-top: 0.25rem solid var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading p {
+  margin-top: 1rem;
+  color: var(--secondary-color);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .report-summary {
+    flex-wrap: wrap;
+  }
+  
+  .summary-item {
+    min-width: calc(50% - 0.5rem);
+  }
+}
+
+@media (max-width: 768px) {
+  .filter-actions {
+    justify-content: space-between;
+  }
+  
+  .table-actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .search-container {
+    width: 100%;
+  }
+  
+  .export-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .summary-item {
+    min-width: 100%;
+  }
+  
+  .transaction-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .main-content {
+    padding: 1rem;
+  }
+  
+  .modal-content {
+    margin: 1rem;
+    width: calc(100% - 2rem);
+  }
+  
+  .btn-sm {
+    padding: 0.25rem 0.375rem;
+  }
+  
+  .report-table {
+    font-size: 0.875rem;
+  }
+  
+  .report-header h1 {
+    font-size: 1.5rem;
+  }
+}
+
+
+/* .export-actions {
+    display: none !important;
+} */
+
+     </style>
+</head>
+<body>
+
+  <main class="main-content">
+              <div class="container">
+                  <div class="report-header">
+                      <h1>Supplier Report</h1>
+                      <p>Search for supplier transactions and view detailed reports</p>
+                  </div>
+      
+                  <div class="report-filters card">
+                      <div class="filter-section">
+                          <div class="supplier-search-container">
+                              <label for="supplierSearch">Supplier Name</label>
+                              <div class="autocomplete-wrapper">
+                                  <input type="text" id="supplierSearch" placeholder="Search for supplier...">
+                                  <div id="supplierSuggestions" class="autocomplete-suggestions"></div>
+                              </div>
+                          </div>
+                          
+                          <div class="date-range-container">
+                              <div class="date-inputs">
+                                  <div class="form-group">
+                                      <label for="fromDate">From Date</label>
+                                      <input type="date" id="fromDate">
+                                  </div>
+                                  <div class="form-group">
+                                      <label for="toDate">To Date</label>
+                                      <input type="date" id="toDate">
+                                  </div>
+                              </div>
+                              
+                              <div class="date-shortcuts">
+                                  <button type="button" class="btn btn-sm date-btn" data-range="today">Today</button>
+                                  <button type="button" class="btn btn-sm date-btn" data-range="yesterday">Yesterday</button>
+                                  <button type="button" class="btn btn-sm date-btn" data-range="week">This Week</button>
+                                  <button type="button" class="btn btn-sm date-btn" data-range="month">This Month</button>
+                                  <button type="button" class="btn btn-sm date-btn" data-range="year">This Year</button>
+                              </div>
+                          </div>
+                      </div>
+                      
+                      <div class="filter-actions">
+                          <button type="button" class="btn btn-secondary" id="resetBtn">Reset</button>
+                          <button type="button" class="btn btn-primary" id="generateReportBtn">Generate Report</button>
+                      </div>
+                  </div>
+                  
+                  <div class="report-summary card">
+                      <div class="summary-item">
+                          <div class="summary-label">Total Transactions</div>
+                          <div class="summary-value" id="totalTransactions">0</div>
+                      </div>
+                      <div class="summary-item">
+                          <div class="summary-label">Total Purchases</div>
+                          <div class="summary-value" id="totalPurchases">Rs0.00</div>
+                      </div>
+                      <div class="summary-item" hidden>
+                        <div class="summary-label">Total Return</div>
+                        <div class="summary-value" id="totalReturn">Rs0.00</div>
+                    </div>
+                    <div class="summary-item">
+                      <div class="summary-label">Total Due Amount</div>
+                      <div class="summary-value" id="totalDueAmount">Rs0.00</div>
+                  </div>
+                      <div class="summary-item">
+                          <div class="summary-label">Total Paid Amount</div>
+                          <div class="summary-value" id="totalPaidAmount">Rs0.00</div>
+                      </div>
+
+                      <div class="summary-item">
+                        <div class="summary-label">Total Receive Amount</div>
+                        <div class="summary-value" id="totalReceiveAmount">Rs0.00</div>
+                    </div>
+
+
+                    <div class="summary-item">
+                      <div class="summary-label">Purchase Paid Amount</div>
+                      <div class="summary-value" id="totalPurchasePaid">Rs 0.00</div>
+                  </div>
+                  
+                  <div class="summary-item">
+                      <div class="summary-label">Purchase Due Amount</div>
+                      <div class="summary-value" id="totalPurchaseDue">Rs 0.00</div>
+                  </div>
+                  
+                  <div class="summary-item">
+                      <div class="summary-label">Return Paid Amount</div>
+                      <div class="summary-value" id="totalReturnPaid">Rs 0.00</div>
+                  </div>
+                  
+                  <div class="summary-item">
+                      <div class="summary-label">Return Due Amount</div>
+                      <div class="summary-value" id="totalReturnDue">Rs 0.00</div>
+                  </div>
+
+                      <!-- In your summary section, add these elements -->
+
+
+                      
+
+                  </div>
+                  
+                  <div class="report-details card">
+                      <div class="table-actions">
+                          <div class="search-container">
+                              <input type="text" id="tableSearch" placeholder="Search Bill#...">
+                          </div>
+                          <div class="export-actions" >
+                              <button type="button" class="btn btn-sm" id="printBtn">
+                                  <i class="fas fa-print"></i> Print
+                              </button>
+                              <button type="button" class="btn btn-sm" id="exportCsvBtn">
+                                  <i class="fas fa-file-csv"></i> Export CSV
+                              </button>
+                              <button type="button" class="btn btn-sm" id="exportPdfBtn" >
+                                  <i class="fas fa-file-pdf"></i> Export PDF
+                              </button>
+                          </div>
+                      </div>
+                      
+                      <div class="table-responsive">
+                          <table class="report-table" id="reportTable">
+                              <thead>
+                                  <tr>
+                                      <th>Invoice #</th>
+                                       <th>Bill No</th>
+                                      <th>Date</th>
+                                      <th>Supplier</th>
+                                      <th>Type</th>
+                                      <th>Payment Method</th>
+                                      <th>Items</th>
+                                      <th>Total</th>
+                                      <th>Paid</th>
+                                      <th>Receive Amount</th>
+                                      <th>Balance</th>
+                                      <th>Actions</th>
+                                  </tr>
+                              </thead>
+                              <tbody id="reportData">
+                                  <!-- Report data will be loaded here -->
+                              </tbody>
+                              <tfoot>
+                                  <tr>
+                                      <td colspan="6" class="text-right"><strong>Totals:</strong></td>
+                                      <td id="footerTotal">Rs0.00</td>
+                                      <td id="footerPaid">Rs0.00</td>
+                                      <td id="footerBalance">Rs0.00</td>
+                                      <td></td>
+                                  </tr>
+                              </tfoot>
+                          </table>
+                      </div>
+                      
+                  <!-- Update your pagination controls to this structure -->
+<div class="pagination-controls">
+  <button id="prevPage" disabled>&lt; Prev</button>
+  <div id="paginationNumbers" class="pagination-numbers">
+      <!-- Page numbers will be added here dynamically -->
+  </div>
+  <button id="nextPage" disabled>Next &gt;</button>
+  <span id="pageInfo">Page 1 of 1</span>
+</div>
+                  </div>
+              </div>
+      
+              <!-- Transaction Details Modal -->
+              <div id="transactionModal" class="modal">
+                  <div class="modal-content transaction-modal">
+                      <div class="modal-header">
+                          <h2>Transaction Details</h2>
+                          <button type="button" class="close-btn">&times;</button>
+                      </div>
+                      <div class="modal-body">
+                          <div class="transaction-header">
+                              <div class="transaction-info">
+                                  <p><strong>Invoice #:</strong> <span id="modalInvoiceNumber"></span></p>
+                                  <p><strong>Date:</strong> <span id="modalDate"></span></p>
+                                  <p><strong>Supplier:</strong> <span id="modalSupplier"></span></p>
+                              </div>
+                              <div class="transaction-details">
+                                  <p><strong>Type:</strong> <span id="modalType"></span></p>
+                                  <p><strong>Payment Method:</strong> <span id="modalPaymentMethod"></span></p>
+                                  <p><strong>Status:</strong> <span id="modalStatus"></span></p>
+                              </div>
+                          </div>
+
+                          
+                          <div class="table-responsive">
+                              <table class="products-table">
+                                  <thead>
+                                      <tr>
+                                          <th>Sr.</th>
+                                          <th>Product</th>
+                                          <th>Cost Price</th>
+                                          <th>Purchase Pack</th>
+                                          <th>Total Amount</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody id="modalProductsList"></tbody>
+                              </table>
+                          </div>
+                          
+                          <div class="transaction-summary">
+                              <div class="summary-row">
+                                  <span>Grand Total:</span>
+                                  <span id="modalGrandTotal">Rs0.00</span>
+                              </div>
+
+                              <div class="summary-row">
+                                <div class="summary-label">Receive Amount:</div>
+                                <div class="summary-value" id="modalReceiveAmount"></div>
+                            </div>
+
+                              <div class="summary-row">
+                                  <span>Tax Amount:</span>
+                                  <span id="modalTaxAmount">Rs0.00</span>
+                              </div>
+                              <div class="summary-row">
+                                  <span>Paid Amount:</span>
+                                  <span id="modalPaidAmount">Rs0.00</span>
+                              </div>
+                              <div class="summary-row">
+                                  <span>Balance:</span>
+                                  <span id="modalBalance">Rs0.00</span>
+                              </div>
+                          </div>
+                          
+                          <div class="comments-section">
+                              <h4>Comments</h4>
+                              <p id="modalComments"></p>
+                          </div>
+                      </div>
+                      <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" id="printInvoiceBtn">
+                              <i class="fas fa-print"></i> Print
+                          </button>
+                          <button type="button" class="btn btn-primary" id="modalCloseBtn">Close</button>
+                      </div>
+                  </div>
+              </div>
+      </main>
+              <!-- Loading Spinner -->
+              <div id="loadingSpinner" class="loading" style="display: none;">
+                  <div class="loading-spinner"></div>
+                  <p>Loading data...</p>
+              </div>
+          </div>
+      
+          <script src="js/navbar.js"></script>
+          <script src="js/supplier-report.js"></script>
+          <script src="js/notification.js"></script>
+      </body>
+      </html>

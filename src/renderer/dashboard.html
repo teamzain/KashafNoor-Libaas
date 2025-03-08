@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KashafNoor-Libas Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .date-time-bar {
+            background: linear-gradient(to right, #15803d, #059669);
+            color: white;
+            padding: 0.75rem 1rem;
+            text-align: center;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            height: 3rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .marquee-content {
+            position: absolute;
+            white-space: nowrap;
+            will-change: transform;
+            animation: marquee 30s linear infinite;
+            padding-left: 100%;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.25rem;
+        }
+
+        .card-title {
+            color: #1a1a1a;
+            font-size: 0.875rem;
+            font-weight: 600;
+            letter-spacing: 0.025em;
+            text-transform: uppercase;
+        }
+
+        .card-icon {
+            background: #15803d;
+            color: white;
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            box-shadow: 0 3px 6px rgba(21, 128, 61, 0.3);
+        }
+
+        .stat {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.025em;
+        }
+
+        .trend {
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            color: #15803d;
+            font-weight: 500;
+        }
+
+        .trend.negative {
+            color: #dc2626;
+        }
+
+        .recent-activity {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
+        }
+
+        .activity-header {
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .activity-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .activity-refresh {
+            background: #f3f4f6;
+            border: none;
+            border-radius: 6px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .activity-refresh:hover {
+            background: #e5e7eb;
+        }
+
+        .no-sales-animation {
+            position: relative;
+        }
+
+        .zero-amount {
+            opacity: 0.5;
+        }
+
+        .empty-state-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            background-size: 200% 100%;
+            animation: shine 1.5s infinite;
+            border-radius: 5px;
+        }
+
+        @keyframes shine {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .dashboard-header {
+            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dashboard-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-subtitle {
+            font-size: 1rem;
+            color: #6b7280;
+        }
+
+        .panel-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .panel-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .panel-title i {
+            color: #15803d;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .footer strong {
+            color: #15803d;
+        }
+
+        /* Welcome Popup Styles */
+        .welcome-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .popup-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 500px;
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            text-align: center;
+            animation: scaleIn 0.5s ease-in-out;
+            overflow: hidden;
+        }
+
+        .popup-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .popup-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #15803d;
+            margin-bottom: 0.5rem;
+        }
+
+        .popup-subtitle {
+            font-size: 1rem;
+            color: #6b7280;
+        }
+
+        .popup-icon {
+            font-size: 3rem;
+            color: #15803d;
+            margin-bottom: 1rem;
+        }
+
+        .popup-body {
+            margin-bottom: 1.5rem;
+        }
+
+        .close-popup {
+            display: inline-block;
+            background: #15803d;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .close-popup:hover {
+            background: #166534;
+        }
+
+        .popup-decoration {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(to right, #15803d, #059669);
+            border-radius: 50%;
+            opacity: 0.1;
+        }
+
+        .decoration-1 {
+            top: -75px;
+            left: -75px;
+        }
+
+        .decoration-2 {
+            bottom: -75px;
+            right: -75px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes scaleIn {
+            from { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
+            to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        /* Date pill for showing which day's data is being displayed */
+        .date-pill {
+            display: inline-block;
+            background-color: #f3f4f6;
+            border-radius: 16px;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #4b5563;
+            margin-left: 1rem;
+        }
+
+        .date-pill i {
+            margin-right: 0.25rem;
+            color: #15803d;
+        }
+    </style>
+</head>
+<body>
+    <main class="main-content">
+        <div class="dashboard">
+            <div class="date-time-bar">
+                <div class="marquee-content" id="dateTimeMarquee">Loading date and time...</div>
+            </div>
+
+            <!-- <div class="dashboard-header">
+                <h1 class="dashboard-title">KashafNoor-Libas Dashboard</h1>
+                <p class="dashboard-subtitle">Welcome back! Here's your business at a glance</p>
+            </div> -->
+
+            <div class="panel-section">
+                <h2 class="panel-title">
+                    <i class="fas fa-chart-line"></i> Key Performance Metrics
+                    <span class="date-pill" id="displayDatePill">
+                        <i class="fas fa-calendar-day"></i>
+                        <span id="displayDateText">Today</span>
+                    </span>
+                </h2>
+                <div class="stats-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">TOTAL SALES</span>
+                            <div class="card-icon">
+                                <i class="fas fa-rupee-sign"></i>
+                            </div>
+                        </div>
+                        <div class="stat" id="totalSales">Loading...</div>
+                        <div class="trend" id="salesTrend">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>Calculating...</span>
+                        </div>
+                    </div>
+        
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">TODAY'S SALES</span>
+                            <div class="card-icon">
+                                <i class="fas fa-calendar-day"></i>
+                            </div>
+                        </div>
+                        <div class="stat" id="todaySales">Loading...</div>
+                        <div class="trend">
+                            <i class="fas fa-clock"></i>
+                            <span id="todayDate">Today</span>
+                        </div>
+                    </div>
+        
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">TOTAL PRODUCTS</span>
+                            <div class="card-icon">
+                                <i class="fas fa-box"></i>
+                            </div>
+                        </div>
+                        <div class="stat" id="productCount">Loading...</div>
+                        <div class="trend" id="productTrend">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>Calculating...</span>
+                        </div>
+                    </div>
+        
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">TOTAL CUSTOMERS</span>
+                            <div class="card-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                        <div class="stat" id="customerCount">Loading...</div>
+                        <div class="trend" id="customerTrend">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>Calculating...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <h2 class="panel-title"><i class="fas fa-history"></i> Recent Transactions</h2>
+                <div class="recent-activity">
+                    <div class="activity-header">
+                        <h3 class="activity-title">Latest Sales</h3>
+                        <button class="activity-refresh" id="refreshActivity">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                    <div id="activityList">Loading recent transactions...</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>KashafNoor-Libas &copy; 2025 | Developed by <strong>ZY Dev's</strong></p>
+        </div>
+    </main>
+
+    <!-- Welcome Popup -->
+    <div class="welcome-popup" id="welcomePopup">
+        <div class="popup-content">
+            <div class="popup-decoration decoration-1"></div>
+            <div class="popup-decoration decoration-2"></div>
+            <div class="popup-icon">
+                <i class="fas fa-store"></i>
+            </div>
+            <div class="popup-header">
+                <h2 class="popup-title">Welcome to KashafNoor</h2>
+                <p class="popup-subtitle">Your Retail Management Dashboard</p>
+            </div>
+            <div class="popup-body">
+                <p>Thank you for choosing <strong>ZY Dev's.</strong> . Your dashboard is now ready with the latest insights and tools to help you manage your business efficiently.</p>
+    
+            </div>
+            <button class="close-popup" id="closePopup">Get Started</button>
+        </div>
+    </div>
+    
+    
+
+    <script src="js/navbar.js"></script>
+    <script>
+        // Welcome popup functionality
+      // Welcome popup functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const welcomePopup = document.getElementById('welcomePopup');
+    const closePopup = document.getElementById('closePopup');
+    
+    // Show popup with slight delay for better effect
+    setTimeout(() => {
+        welcomePopup.style.display = 'block';
+    }, 500);
+    
+    // Auto-close popup after 5 seconds (5000ms)
+    setTimeout(() => {
+        fadeOutAndHidePopup();
+    }, 5000);
+    
+    // Close popup when button is clicked
+    closePopup.addEventListener('click', function() {
+        fadeOutAndHidePopup();
+    });
+    
+    function fadeOutAndHidePopup() {
+        welcomePopup.style.animation = 'fadeOut 0.5s forwards';
+        setTimeout(() => {
+            welcomePopup.style.display = 'none';
+        }, 500);
+    }
+});
+
+// Date and Time Marquee - Continuous version
+function updateDateTime() {
+    const now = new Date();
+    const options = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    };
+    const dateTimeString = now.toLocaleDateString('en-US', options);
+    
+    // Update today's date in the trend area
+    const todayDate = document.getElementById('todayDate');
+    if (todayDate) {
+        todayDate.textContent = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+    
+    // Add business information to make the marquee more interesting
+    const marqueeContent = `📅 ${dateTimeString} | 🏢 KashafNoor-Libas Dashboard | 📈 Real-time Analytics | 📊 Performance Metrics | 💼 Business Management | 👗 Fashion Retail | 💰 Sales Overview | 🔄 Auto-refreshing Data | 📅 ${dateTimeString} | 🏢 KashafNoor-Libas Dashboard | 📈 Real-time Analytics`;
+    
+    document.getElementById('dateTimeMarquee').textContent = marqueeContent;
+}
+
+// Initial update and set interval
+updateDateTime();
+setInterval(updateDateTime, 1000);
+
+// Function to fetch and update dashboard data
+async function updateDashboard() {
+    try {
+        // Get sales data using the proper method from your API
+        const sales = await window.api.getAllSales();
+        
+        // Calculate total sales (for all time)
+        const totalSales = sales.reduce((sum, sale) => {
+            // Use the properly named property from your DB schema
+            const amount = parseFloat(sale.grandTotal) || 0;
+            return sum + amount;
+        }, 0);
+        
+        // Update total sales display
+        const totalSalesElement = document.getElementById('totalSales');
+        if (totalSalesElement) {
+            totalSalesElement.textContent = `Rs${totalSales.toLocaleString()}`;
+        }
+
+        // Calculate today's sales with current date
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Set to beginning of day for accurate comparison
+        const todayString = today.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+        
+        // Find most recent date with sales
+        let mostRecentDate = null;
+        let mostRecentSales = 0;
+        let salesByDate = {};
+        
+        // Group sales by date and find the most recent date with sales
+        sales.forEach(sale => {
+            if (!sale.date) return;
+            
+            // Parse the sale date and normalize to beginning of day
+            const saleDate = new Date(sale.date);
+            saleDate.setHours(0, 0, 0, 0);
+            const saleDateString = saleDate.toISOString().split('T')[0];
+            
+            // Initialize the total for this date if it doesn't exist
+            if (!salesByDate[saleDateString]) {
+                salesByDate[saleDateString] = 0;
+            }
+            
+            // Add this sale to the date's total (ensure we're using a number)
+            const saleAmount = parseFloat(sale.grandTotal) || 0;
+            salesByDate[saleDateString] += saleAmount;
+            
+            // Debug line - you can remove this after fixing
+            console.log(`Sale on ${saleDateString}: ${saleAmount} Rs, Total for day: ${salesByDate[saleDateString]} Rs`);
+            
+            // Update most recent date if this sale is more recent
+            if (!mostRecentDate || saleDate > new Date(mostRecentDate)) {
+                mostRecentDate = saleDateString;
+                mostRecentSales = salesByDate[saleDateString];
+            }
+        });
+        
+        // Check if there are sales today
+        const todaySales = salesByDate[todayString] || 0;
+        
+        // Debug log - you can remove this after fixing
+        console.log(`Today (${todayString}) sales total: ${todaySales} Rs`);
+        console.log(`Most recent sales day (${mostRecentDate}): ${mostRecentSales} Rs`);
+        
+        // Update today's sales display
+        const todaySalesElement = document.getElementById('todaySales');
+        const displayDatePill = document.getElementById('displayDatePill');
+        const displayDateText = document.getElementById('displayDateText');
+        const todayDateElement = document.getElementById('todayDate');
+        
+        if (todaySalesElement) {
+            if (todaySales > 0) {
+                // We have sales today
+                todaySalesElement.textContent = `Rs${todaySales.toLocaleString()}`;
+                todaySalesElement.classList.remove('no-sales-animation');
+                if (displayDateText) displayDateText.textContent = "Today";
+                if (todayDateElement) todayDateElement.textContent = "Today";
+                
+                // Make sure card title says TODAY'S SALES
+                const todaySalesCardTitle = document.querySelector('.card:nth-child(2) .card-title');
+                if (todaySalesCardTitle) {
+                    todaySalesCardTitle.textContent = "TODAY'S SALES";
+                }
+            } else if (mostRecentDate) {
+                // No sales today, show most recent date with sales
+                todaySalesElement.textContent = `Rs${mostRecentSales.toLocaleString()}`;
+                todaySalesElement.classList.remove('no-sales-animation');
+                
+                // Update the date pill to show which date we're displaying
+                const displayDate = new Date(mostRecentDate);
+                const formattedDate = displayDate.toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric',
+                    year: today.getFullYear() !== displayDate.getFullYear() ? 'numeric' : undefined
+                });
+                
+                if (displayDateText) displayDateText.textContent = formattedDate;
+                if (todayDateElement) todayDateElement.textContent = formattedDate;
+                
+                // Update the card title to reflect we're showing the most recent date's sales
+                const todaySalesCardTitle = document.querySelector('.card:nth-child(2) .card-title');
+                if (todaySalesCardTitle) {
+                    todaySalesCardTitle.textContent = "MOST RECENT SALES";
+                }
+            } else {
+                // No sales at all
+                todaySalesElement.innerHTML = '<span class="zero-amount">Rs0</span><div class="empty-state-animation"></div>';
+                todaySalesElement.classList.add('no-sales-animation');
+                if (displayDateText) displayDateText.textContent = "Today";
+                if (todayDateElement) todayDateElement.textContent = "Today";
+                
+                // Make sure card title says TODAY'S SALES
+                const todaySalesCardTitle = document.querySelector('.card:nth-child(2) .card-title');
+                if (todaySalesCardTitle) {
+                    todaySalesCardTitle.textContent = "TODAY'S SALES";
+                }
+            }
+        }
+
+        // Get products count
+        try {
+            const products = await window.api.getAllProducts();
+            const productCountElement = document.getElementById('productCount');
+            if (productCountElement) {
+                productCountElement.textContent = products.length.toLocaleString();
+            }
+        } catch (error) {
+            console.log("Error loading products or element not found:", error);
+            const productCountElement = document.getElementById('productCount');
+            if (productCountElement) {
+                productCountElement.textContent = "N/A";
+            }
+        }
+
+        // Get customers count
+        try {
+            const customers = await window.api.getCustomers();
+            const customerCountElement = document.getElementById('customerCount');
+            if (customerCountElement) {
+                customerCountElement.textContent = customers.length.toLocaleString();
+            }
+        } catch (error) {
+            console.log("Error loading customers or element not found:", error);
+            const customerCountElement = document.getElementById('customerCount');
+            if (customerCountElement) {
+                customerCountElement.textContent = "N/A";
+            }
+        }
+
+        // Calculate monthly trends
+        const calculateMonthlyTrend = (data) => {
+            // Group sales by month
+            const salesByMonth = {};
+            data.forEach(sale => {
+                if (sale.date) {
+                    const date = new Date(sale.date);
+                    const monthKey = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+                    if (!salesByMonth[monthKey]) {
+                        salesByMonth[monthKey] = 0;
+                    }
+                    salesByMonth[monthKey] += parseFloat(sale.grandTotal) || 0;
+                }
+            });
+            
+            // Sort months chronologically
+            const months = Object.keys(salesByMonth).sort((a, b) => {
+                const dateA = new Date(a);
+                const dateB = new Date(b);
+                return dateB - dateA;
+            });
+            
+            if (months.length < 2) return 0;
+            
+            const currentMonth = salesByMonth[months[0]];
+            const previousMonth = salesByMonth[months[1]];
+            
+            // Calculate percentage change
+            return calculateTrend(currentMonth, previousMonth);
+        };
+
+        // Update sales trend
+        const salesTrendElement = document.getElementById('salesTrend');
+        if (salesTrendElement) {
+            const trendValue = calculateMonthlyTrend(sales);
+            updateTrend('salesTrend', trendValue);
+        }
+        
+        // Update other trends (these are examples, adjust as needed)
+        updateTrend('productTrend', 3.5);
+        updateTrend('customerTrend', 7.2);
+
+        // Display recent transactions in the activity list
+        updateRecentTransactions(sales);
+
+    } catch (error) {
+        console.error('Error updating dashboard:', error);
+        
+        // Handle errors gracefully in the UI
+        const totalSalesElement = document.getElementById('totalSales');
+        if (totalSalesElement) {
+            totalSalesElement.textContent = "Error loading";
+        }
+        
+        const todaySalesElement = document.getElementById('todaySales');
+        if (todaySalesElement) {
+            todaySalesElement.textContent = "Error loading";
+        }
+        
+        const activityList = document.getElementById('activityList');
+        if (activityList) {
+            activityList.innerHTML = '<p>Error loading recent transactions. Please try refreshing.</p>';
+        }
+    }
+}
+
+// Helper function to calculate trend percentage
+function calculateTrend(current, previous) {
+    if (!previous) return 0;
+    return ((current - previous) / previous * 100).toFixed(1);
+}
+
+// Helper function to update trend UI
+function updateTrend(elementId, trendValue) {
+    const element = document.getElementById(elementId);
+    if (!element) return; // Skip if element doesn't exist
+    
+    const icon = element.querySelector('i');
+    const text = element.querySelector('span');
+    
+    if (!icon || !text) return; // Skip if child elements don't exist
+    
+    if (trendValue >= 0) {
+        element.className = 'trend';
+        icon.className = 'fas fa-arrow-up';
+        text.textContent = `${trendValue}% increase`;
+    } else {
+        element.className = 'trend negative';
+        icon.className = 'fas fa-arrow-down';
+        text.textContent = `${Math.abs(trendValue)}% decrease`;
+    }
+}
+
+// Function to update recent transactions
+function updateRecentTransactions(sales) {
+    const activityList = document.getElementById('activityList');
+    if (!activityList) return;
+    
+    // Sort sales by date (newest first)
+    const recentSales = [...sales].sort((a, b) => {
+        return new Date(b.date) - new Date(a.date);
+    }).slice(0, 5); // Get the 5 most recent sales
+    
+    if (recentSales.length === 0) {
+        activityList.innerHTML = '<p>No recent transactions found.</p>';
+        return;
+    }
+    
+    let html = '<div style="overflow-x: auto;"><table style="width: 100%; border-collapse: collapse;">';
+    html += '<thead><tr style="border-bottom: 1px solid #e5e7eb; text-align: left;">';
+    html += '<th style="padding: 0.75rem 1rem;">Invoice</th>';
+    html += '<th style="padding: 0.75rem 1rem;">Date</th>';
+    html += '<th style="padding: 0.75rem 1rem;">Customer</th>';
+    html += '<th style="padding: 0.75rem 1rem;">Amount</th>';
+    html += '<th style="padding: 0.75rem 1rem;">Status</th>';
+    html += '</tr></thead>';
+    html += '<tbody>';
+    
+    recentSales.forEach(sale => {
+        const saleDate = new Date(sale.date).toLocaleDateString();
+        const isPaid = sale.dueAmount <= 0;
+        const statusClass = isPaid ? 'color: #15803d;' : 'color: #f59e0b;';
+        const statusText = isPaid ? 'Paid' : 'Partial';
+        
+        html += `<tr style="border-bottom: 1px solid #f3f4f6;">`;
+        html += `<td style="padding: 0.75rem 1rem;">#${sale.invoiceNumber}</td>`;
+        html += `<td style="padding: 0.75rem 1rem;">${saleDate}</td>`;
+        html += `<td style="padding: 0.75rem 1rem;">${sale.customerName}</td>`;
+        html += `<td style="padding: 0.75rem 1rem; font-weight: 600;">Rs${parseFloat(sale.grandTotal).toLocaleString()}</td>`;
+        html += `<td style="padding: 0.75rem 1rem; ${statusClass} font-weight: 500;">${statusText}</td>`;
+        html += `</tr>`;
+    });
+    
+    html += '</tbody></table></div>';
+    activityList.innerHTML = html;
+}
+
+// Refresh button event listener
+const refreshButton = document.getElementById('refreshActivity');
+if (refreshButton) {
+    refreshButton.addEventListener('click', () => {
+        // Show loading state
+        const activityList = document.getElementById('activityList');
+        if (activityList) {
+            activityList.innerHTML = '<p>Refreshing data...</p>';
+        }
+        
+        // Update dashboard
+        updateDashboard();
+    });
+}
+
+// Initial update
+updateDashboard();
+
+// Update every 30 seconds
+setInterval(updateDashboard, 30000);
+    </script>
+</body>
+</html>

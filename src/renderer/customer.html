@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Management</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+   
+
+    <link rel="stylesheet" href="style/customer.css">
+  <html>
+
+<body>
+    <div id="overlay" class="overlay"></div>
+    <div id="loader" class="loader"></div>
+ 
+    <main class="main-content">
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <h1><i class="fas fa-users"></i> Customer Management</h1>
+                <button id="addCustomerBtn" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add Customer
+                </button>
+            </div>
+
+            <div class="search-container">
+                <input type="text" id="searchField" placeholder="Search customers..." onkeyup="filterCustomers()">
+            </div>
+
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Customer ID</th>
+                            <th>Customer Name</th>
+                            <th>Address</th>
+                            <th>Phone Number</th>
+                            <th>Shop Name</th>
+                            <th>CNIC</th>
+                            <th>Area Code</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customerTableBody">
+                        <!-- Customer data will be dynamically inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="customerModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Add Customer</h2>
+            <form id="customerForm">
+                <div class="form-group">
+                    <label for="customerName">Customer Name</label>
+                    <input type="text" id="customerName" required>
+                </div>
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <input type="text" id="address" required>
+                </div>
+                <div class="form-group">
+                    <label for="phoneNumber">Phone Number</label>
+                    <input type="tel" id="phoneNumber" required>
+                </div>
+                <div class="form-group">
+                    <label for="shopName">Shop Name</label>
+                    <input type="text" id="shopName" required>
+                </div>
+                <div class="form-group">
+                    <label for="customerCnic">CNIC</label>
+                    <input type="text" id="customerCnic" required>
+                </div>
+                <div class="form-group">
+                    <label for="areaCode">Area Code</label>
+                    <input type="text" id="areaCode" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="saveCustomer" class="btn btn-primary">Save</button>
+                    <button type="button" id="cancelCustomer" class="btn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+<script src="js/navbar.js"></script>
+   <script>
+        window.api = {
+            getCustomers: async () => {
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                return [
+                    { customer_id: 1, customer_name: 'John Doe', address: '123 Main St', phone_number: '(555) 123-4567', shop_name: 'John\'s Shop', customer_cnic: '12345-6789012-3', area_code: 'A001' },
+                    { customer_id: 2, customer_name: 'Jane Smith', address: '456 Oak Ave', phone_number: '(555) 987-6543', shop_name: 'Jane\'s Store', customer_cnic: '98765-4321098-7', area_code: 'B002' }
+                ];
+            },
+            addCustomer: async (customer) => {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                return { success: true };
+            },
+            updateCustomer: async (customer) => {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                return { success: true };
+            },
+            deleteCustomer: async (id) => {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                return { success: true };
+            }
+        };
+
+        let currentEditingCustomerId = null;
+        let allCustomers = [];
+        let loaderTimeout = null;
+
+        function showLoader(minDuration = 4000) {
+            if (loaderTimeout) {
+                clearTimeout(loaderTimeout);
+            }
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('loader').style.display = 'block';
+            loaderTimeout = setTimeout(hideLoader, minDuration);
+        }
+
+        function hideLoader() {
+            if (loaderTimeout) {
+                clearTimeout(loaderTimeout);
+            }
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('loader').style.display = 'none';
+        }
+
+        async function safeApiCall(apiCall) {
+            showLoader(4000);
+            try {
+                return await apiCall();
+            } catch (error) {
+                console.error('Error:', error);
+                throw error;
+            } finally {
+                setTimeout(hideLoader, 1000);
+            }
+        }
+
+        function initializeEventListeners() {
+            document.getElementById('addCustomerBtn').addEventListener('click', () => {
+                resetForm();
+                document.getElementById('modalTitle').innerText = 'Add Customer';
+                currentEditingCustomerId = null;
+                toggleModal(true);
+            });
+
+            document.getElementById('cancelCustomer').addEventListener('click', () => {
+                resetForm();
+                toggleModal(false);
+            });
+
+            document.getElementById('saveCustomer').addEventListener('click', async () => {
+                const customerName = document.getElementById('customerName').value;
+                const address = document.getElementById('address').value;
+                const phoneNumber = document.getElementById('phoneNumber').value;
+                const shopName = document.getElementById('shopName').value;
+                const customerCnic = document.getElementById('customerCnic').value;
+                const areaCode = document.getElementById('areaCode').value;
+
+                if (!customerName || !address || !phoneNumber || !shopName || !customerCnic || !areaCode) {
+                    return;
+                }
+
+                const customer = { 
+                    customerName, 
+                    address, 
+                    phoneNumber, 
+                    shopName, 
+                    customerCnic, 
+                    areaCode 
+                };
+
+                try {
+                    if (currentEditingCustomerId) {
+                        customer.customer_id = currentEditingCustomerId;
+                        await safeApiCall(() => window.api.updateCustomer(customer));
+                    } else {
+                        await safeApiCall(() => window.api.addCustomer(customer));
+                    }
+
+                    resetForm();
+                    toggleModal(false);
+                    await loadCustomers();
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            });
+        }
+
+        async function loadCustomers() {
+            try {
+                const customers = await safeApiCall(window.api.getCustomers);
+                allCustomers = customers;
+                displayCustomers(customers);
+            } catch (error) {
+                console.error('Error loading customers:', error);
+            }
+        }
+
+        function displayCustomers(customers) {
+            const customerTableBody = document.getElementById('customerTableBody');
+            customerTableBody.innerHTML = '';
+
+            customers.forEach(customer => {
+                const row = customerTableBody.insertRow();
+                row.innerHTML = `
+                    <td>${customer.customer_id}</td>
+                    <td>${customer.customer_name}</td>
+                    <td>${customer.address}</td>
+                    <td>${customer.phone_number}</td>
+                    <td>${customer.shop_name}</td>
+                    <td>${customer.customer_cnic}</td>
+                    <td>${customer.area_code}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button onclick="editCustomer(${customer.customer_id})" class="btn btn-primary">Edit</button>
+                            <button onclick="deleteCustomer(${customer.customer_id})" class="btn">Delete</button>
+                        </div>
+                    </td>
+                `;
+            });
+        }
+
+        function editCustomer(id) {
+            const customer = allCustomers.find(c => c.customer_id === id);
+
+            if (customer) {
+                document.getElementById('customerName').value = customer.customer_name;
+                document.getElementById('address').value = customer.address;
+                document.getElementById('phoneNumber').value = customer.phone_number;
+                document.getElementById('shopName').value = customer.shop_name;
+                document.getElementById('customerCnic').value = customer.customer_cnic;
+                document.getElementById('areaCode').value = customer.area_code;
+
+                document.getElementById('modalTitle').innerText = 'Edit Customer';
+                currentEditingCustomerId = id;
+                toggleModal(true);
+            }
+        }
+
+        async function deleteCustomer(id) {
+            try {
+                await safeApiCall(() => window.api.deleteCustomer(id));
+                await loadCustomers();
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function filterCustomers() {
+            const searchTerm = document.getElementById('searchField').value.toLowerCase();
+            const filteredCustomers = allCustomers.filter(customer => 
+                customer.customer_name.toLowerCase().includes(searchTerm)
+            );
+            displayCustomers(filteredCustomers);
+        }
+
+        function toggleModal(show) {
+            const modal = document.getElementById('customerModal');
+            modal.style.display = show ? 'flex' : 'none';
+        }
+
+        function resetForm() {
+            document.getElementById('customerForm').reset();
+            currentEditingCustomerId = null;
+        }
+
+        window.onload = () => {
+            initializeEventListeners();
+            loadCustomers();
+        };
+    </script>
+</body>
+</html>

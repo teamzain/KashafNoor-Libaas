@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline';">
+    <title>Login - KashafNoor</title>
+    <style>
+        /* Add styles for the eye icon */
+        .password-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        
+        .password-container input {
+            flex: 1;
+        }
+        
+        .eye-icon {
+            position: absolute;
+            right: 10px;
+            cursor: pointer;
+            user-select: none;
+            font-size: 1.2em;
+        }
+
+        /* Add shake animation */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
+        /* Success checkmark styles */
+        .success-checkmark {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .success-checkmark.show {
+            display: block;
+        }
+
+        .checkmark__circle {
+    stroke-dasharray: 166;
+    stroke-dashoffset: 166;
+    stroke-width: 2;
+    stroke-miterlimit: 10;
+    stroke: #3A4F48;
+    fill: none;
+    animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+
+        .checkmark__check {
+            transform-origin: 50% 50%;
+            stroke-dasharray: 48;
+            stroke-dashoffset: 48;
+            stroke: #3A4F48;
+            animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+        }
+
+        @keyframes stroke {
+            100% { stroke-dashoffset: 0; }
+        }
+       
+      
+        
+        /* Initially hide the signup link with !important to override any other styles */
+      /* Initially hide the signup link with !important to override any other styles */
+.signup-link {
+    display: none !important;
+}
+        
+/* Class to show the signup link when needed */
+.show-signup {
+    display: block !important;
+}
+    </style>
+    <link rel="stylesheet" href="style/login.css">
+</head>
+<body>
+    <div class="split-container">
+        <div class="image-section">
+            <div class="logo-container">
+                <img src="../img/logo.jpeg" alt="Logo">
+            </div>
+        </div>
+        <div class="form-section">
+            <div class="success-checkmark" id="successCheckmark">
+                <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                    <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+                    <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                </svg>
+            </div>
+            <div class="login-container">
+                <h1>Welcome Back</h1>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="password-container">
+                            <input type="password" id="password" name="password" required />
+                            <span id="togglePassword" class="eye-icon">👁️</span>
+                        </div>
+                    </div>
+                    <button type="submit">Login</button>
+                </form>
+                <div class="signup-link" id="signupLink">
+                    <p>Don't have an account? <a href="signup.html">Sign up here</a></p>
+                </div>
+                <p id="message"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const form = document.getElementById('loginForm');
+        const message = document.getElementById('message');
+        const successCheckmark = document.getElementById('successCheckmark');
+        const loginContainer = document.querySelector('.login-container');
+        const signupLink = document.getElementById('signupLink');
+
+        // Clear any existing session data
+        sessionStorage.clear();
+        
+        // Function to check if users exist
+        async function checkUsersExist() {
+            try {
+                console.log('Checking if users exist...');
+                
+                // Check if users exist via a different method - check if login is successful
+                const hasUsers = await window.api.hasAnyUsers();
+                console.log('Has users result:', hasUsers);
+                
+                if (hasUsers === false) {
+                    // No users, show signup link
+                    console.log('No users found. Showing signup link.');
+                    signupLink.style.display = 'block';
+                } else {
+                    // Users exist or couldn't determine, hide signup link
+                    console.log('Users found or couldn\'t determine. Hiding signup link.');
+                    signupLink.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error checking users:', error);
+                // If error, assume users might exist and hide signup
+                signupLink.style.display = 'none';
+            }
+        }
+        
+// Replace the entire checkUsersExistAlternative function with this:
+async function checkUsersExistAlternative() {
+    try {
+        const userData = await window.api.getAllUsers();
+        console.log('User data:', userData);
+        
+        // Look at the exact structure of your data
+        if (userData && userData.users && userData.users.length === 0) {
+            console.log('No users found. Showing signup link.');
+            signupLink.classList.add('show-signup');
+        } else {
+            console.log('Users found. Hiding signup link.');
+            signupLink.classList.remove('show-signup');
+        }
+    } catch (error) {
+        console.error('Error checking users:', error);
+        // Show signup link by default if there's an error
+        signupLink.classList.add('show-signup');
+    }
+}
+        
+        // Try the direct approach first
+        try {
+            if (typeof window.api.hasAnyUsers === 'function') {
+                await checkUsersExist();
+            } else {
+                // Fall back to the alternative approach
+                await checkUsersExistAlternative();
+            }
+        } catch (error) {
+            console.error('Error during initial check:', error);
+            // Fall back to the alternative approach
+            await checkUsersExistAlternative();
+        }
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const username = form.username.value;
+            const password = form.password.value;
+
+            if (!username || !password) {
+                message.style.color = '#ff3333';
+                message.textContent = 'Please fill in all fields';
+                form.classList.add('shake');
+                setTimeout(() => form.classList.remove('shake'), 500);
+                return;
+            }
+
+            try {
+                const result = await window.api.validateUser({ username, password });
+
+                if (result.success) {
+                    // Store basic user data
+                    sessionStorage.setItem('username', username);
+                    sessionStorage.setItem('userId', result.userId);
+                    sessionStorage.setItem('actorType', result.actorType || 'salesperson');
+                    
+                    // Hide the login form with fade out
+                    loginContainer.style.opacity = '0';
+                    
+                    // Show success checkmark
+                    setTimeout(() => {
+                        successCheckmark.classList.add('show');
+                    }, 300);
+
+                    // Redirect to purchase page after animation
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 2000);
+                } else {
+                    message.style.color = '#ff3333';
+                    message.textContent = result.error || 'Invalid username or password';
+                    form.classList.add('shake');
+                    setTimeout(() => form.classList.remove('shake'), 500);
+                }
+            } catch (error) {
+                message.style.color = '#ff3333';
+                message.textContent = `Error: ${error.message}`;
+                form.classList.add('shake');
+                setTimeout(() => form.classList.remove('shake'), 500);
+            }
+        });
+
+        // Password visibility toggle
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordField = document.getElementById('password');
+
+        togglePassword.addEventListener('click', () => {
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+            togglePassword.textContent = type === 'password' ? '👁️' : '🔒';
+        });
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KashafNoor-Libas</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style/purchase.css">
+
+</head>
+<body>
+    
+    <main class="main-content">
+    <div class="container">
+        <form id="purchaseForm" class="card">
+            <!-- Form Header -->
+            <div class="form-header">
+                <div class="form-group">
+                    <!-- <label for="invoiceNumber">Invoice Number</label> -->
+                    <input type="text" id="invoiceNumber"  hidden readonly>
+                </div>
+                <div class="form-group">
+                    <label for="date">Date</label>
+                    <input type="date" id="date" required>
+                </div>
+                <div class="form-group">
+                    <label for="billNo">Bill No</label>
+                    <input type="text" id="billNo" required>
+                </div>
+                <div class="form-group">
+                    <label for="supplier">Supplier</label>
+                    <select id="supplier" required>
+                        <option value="">Select Supplier</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Print</label>
+                <div class="radio-group">
+                    <div class="radio-item">
+                        <input type="radio" id="printYes" name="printAfterSave" value="yes">
+                        <label for="printYes">Yes</label>
+                    </div>
+                    <div class="radio-item">
+                        <input type="radio" id="printNo" name="printAfterSave" value="no" checked>
+                        <label for="printNo">No</label>
+                    </div>
+                </div>
+            </div>
+            <!-- Payment Method -->
+            <div class="form-group">
+                <label>Payment Method</label>
+                <div class="radio-group">
+                    <div class="radio-item">
+                        <input type="radio" id="cash" name="paymentMethod" value="cash" checked>
+                        <label for="cash">Cash</label>
+                    </div>
+                    <div class="radio-item">
+                        <input type="radio" id="credit" name="paymentMethod" value="credit">
+                        <label for="credit">Credit</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comments -->
+            <div class="form-group">
+                <label for="comments">Comments (Max 100 characters)</label>
+                <textarea id="comments" maxlength="100" rows="2"></textarea>
+                <small id="charCount" class="char-count">0/100</small>
+            </div>
+
+            <!-- Tax Section -->
+            <div class="tax-section">
+                <label>Purchase Taxes</label>
+                <div class="radio-group">
+                    <div class="radio-item">
+                        <input type="radio" id="taxValue" name="taxType" value="value" checked>
+                        <label for="taxValue">By Value</label>
+                    </div>
+                    <div class="radio-item">
+                        <input type="radio" id="taxPercentage" name="taxType" value="percentage">
+                        <label for="taxPercentage">By Percentage</label>
+                    </div>
+                </div>
+                <div class="tax-input-group">
+                    <label for="taxAmount">Tax Amount</label>
+                    <input type="number" id="taxAmount" placeholder="Enter tax amount" step="0.01" class="tax-input">
+                    <div id="taxDisplay" class="tax-display">Tax: 0.00</div>
+                </div>
+            </div>
+
+            <!-- Products Section -->
+            <!-- Add Free of Cost Option -->
+
+<!-- Updated Products Section -->
+<div class="products-section">
+    <button type="button" class="btn btn-primary" id="addProducts">Add Products (F5)</button>
+    <div class="table-responsive">
+        <table class="products-table">
+            <thead>
+                <tr>
+                    <th>Product Code</th>
+                    <th>Product Name</th>
+                    <th>Cost Price</th>
+                    <th>Purchase Pack</th>
+                    <th>Total Amount</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="productsList"></tbody>
+        </table>
+    </div>
+</div>
+<div class="form-group">
+    <label for="discount Value">Paid Amount</label>
+    <input type="number" id="paidAmount" required min="0" step="0.01">
+</div>
+
+<div class="discount-section">
+    <label>Purchase Discount</label>
+    <div class="radio-group">
+        <div class="radio-item">
+            <input type="radio" id="discountValue" name="discountType" value="value" checked>
+            <label for="discountValue">By Value</label>
+        </div>
+        <div class="radio-item">
+            <input type="radio" id="discountPercentage" name="discountType" value="percentage">
+            <label for="discountPercentage">By Percentage</label>
+        </div>
+    </div>
+    <div class="discount-input-group">
+        <label for="discountAmount">Discount Amount</label>
+        <input type="number" id="discountAmount" placeholder="Enter discount amount" step="0.01" class="discount-input">
+        <div id="discountDisplay" class="discount-display">Discount: 0.00</div>
+    </div>
+</div>
+
+
+
+            <!-- Totals Section -->
+            <div class="totals-section">
+                <div class="form-group">
+                    <label for="grandTotal">Grand Total</label>
+                    <input type="number" id="grandTotal" readonly>
+                </div>
+                <!-- <div class="form-group">
+                    <label for="paidAmount">Paid Amount</label>
+                    <input type="number" id="paidAmount" required min="0" step="0.01">
+                </div> -->
+                <div class="form-group">
+                    <label for="dueAmount">Due Amount</label>
+                    <input type="number" id="dueAmount" readonly>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button type="button" class="btn btn-secondary" id="cancelButton">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Purchase</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Products Search Modal -->
+    <div id="productsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Select Products</h2>
+                <button type="button" class="close-btn">&times;</button>
+            </div>
+            
+            <div class="search-section">
+                <input type="text" id="searchProduct" placeholder="Search by name, code or generic...">
+                <input type="number" id="searchQuantity" placeholder="Quantity" min="1" value="1">
+            </div>
+
+            <div class="table-responsive">
+                <table class="products-table">
+                    <thead>
+                        <tr>
+                            <th class="checkbox-cell">
+                                <input type="checkbox" id="selectAll">
+                            </th>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Stock</th>
+                        </tr>
+                    </thead>
+                    <tbody id="searchResults"></tbody>
+                </table>
+            </div>
+
+            <div class="modal-footer">
+                <div class="selected-count">Selected: <span id="selectedCount">0</span></div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" id="modalCancelBtn">Cancel</button>
+                    <button class="btn btn-primary" id="addSelectedBtn">Add Selected</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="modal">
+        <div class="modal-content confirmation-modal">
+            <div class="modal-header">
+                <h2>Confirm Purchase</h2>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to save this purchase? Once submitted, you cannot edit or delete this entry.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="confirmCancelBtn">Cancel</button>
+                <button class="btn btn-primary" id="confirmSubmitBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content success-modal">
+            <div class="modal-header">
+                <h2>Success!</h2>
+            </div>
+            <div class="modal-body">
+                <div class="success-icon">✓</div>
+                <p>Purchase has been added successfully!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading" style="display: none;">
+        <div class="loading-spinner"></div>
+        <p>Processing...</p>
+    </div>
+    </main>
+    <script>
+        // Wait for the DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get current date in YYYY-MM-DD format
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0'); // January is 0
+            const day = String(today.getDate()).padStart(2, '0');
+            
+            const formattedDate = `${year}-${month}-${day}`;
+            
+            // Set the value of the date input
+            document.getElementById('date').value = formattedDate;
+            
+            // For debugging
+            console.log("Today's date set to:", formattedDate);
+        });
+      </script>
+<script src="js/navbar.js"></script>
+    <script src="js/purchase.js"></script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KashafNoor-Libas - Dashboard</title>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style/style.css">
+    <script src="js/f6.js"></script>
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="brand-container">
+            <a href="dashboard.html" class="brand">KashafNoor-Libas</a>
+        </div>
+        <div class="nav-links">
+            <!-- Main Navigation -->
+            <div class="nav-section">
+                <div class="section-header"><i class="fas fa-tachometer-alt"></i> Main Navigation</div>
+                <a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
+            </div>
+            
+            <!-- Customer Configuration -->
+            <div class="nav-section">
+           
+                <div class="section-header"><i class="fas fa-user-cog"></i> Customer Configuration</div>
+                <a href="customer.html"><i class="fas fa-user-friends"></i> Customer Details</a>
+                <a href="customerreport.html"><i class="fas fa-chart-bar"></i> Customer Reports</a>
+            </div>
+            
+            <!-- Product Configuration -->
+            <div class="nav-section">
+               
+                <div class="section-header"><i class="fas fa-clipboard-list"></i> Product Configuration</div>
+                <a href="barcode.html"><i class="fas fa-barcode"></i> Generate Barcode</a>
+
+                <a href="productsetup.html"><i class="fas fa-clipboard-list"></i> Product Setup</a>
+                <a href="product.html"><i class="fas fa-layer-group"></i> Product Definition</a>
+                <a href="productmanage.html"><i class="fas fa-archive"></i> Product History</a>
+            </div>
+            
+            <!-- Stock Management -->
+            <div class="nav-section">
+                <div class="section-header"><i class="fas fa-warehouse"></i> Stock Management</div>
+           
+                <a href="stockdisplay.html"><i class="fas fa-boxes"></i> Stock History</a>
+                <a href="expense.html"><i class="fas fa-receipt"></i> Shop Expense</a>
+            </div>
+            
+            <!-- Purchase Transactions -->
+            <div class="nav-section">
+           
+                <div class="section-header"><i class="fas fa-cart-plus"></i> Purchase Operations</div>
+                <a href="purchase.html"><i class="fas fa-cart-plus"></i> New Purchase</a>
+                <a href="purchasereturn.html"><i class="fas fa-undo-alt"></i> Purchase Return</a>
+                <div class="section-header"><i class="fas fa-file-invoice"></i> Purchase History</div>
+                <a href="purchasedisplay.html"><i class="fas fa-file-invoice"></i> Purchase Records</a>
+                <a href="purchasereturndisplay.html"><i class="fas fa-clipboard-list"></i> Purchase Return History</a>
+            </div>
+            
+            <!-- Sales Transactions -->
+            <div class="nav-section">
+          
+                <div class="section-header"><i class="fas fa-cash-register"></i> Sales Operations</div>
+                <a href="sale.html"><i class="fas fa-cash-register"></i> New Sale</a>
+                <a href="salereturn.html"><i class="fas fa-reply"></i> Sale Return</a>
+                <div class="section-header"><i class="fas fa-file-invoice-dollar"></i> Sales History</div>
+                <a href="saledisplay.html"><i class="fas fa-file-invoice-dollar"></i> Sales Records</a>
+                <a href="salereturndisplay.html"><i class="fas fa-file-export"></i> Sale Return History</a>
+            </div>
+            
+            <!-- Reports -->
+            <div class="nav-section">
+                <div class="section-header"><i class="fas fa-chart-pie"></i> Reports</div>
+             
+                <a href="setup.html"><i class="fas fa-database"></i> Backup Data</a>
+                <div class="section-header"><i class="fas fa-truck"></i> Supplier Reports</div>
+                <a href="supplierreport.html"><i class="fas fa-truck"></i> View Supplier Report</a>
+                
+                <div class="dropdown-trigger" onclick="toggleReportsDropdown(this)">
+                    <i class="fas fa-chart-line"></i> Sales Reports
+                    <i class="fas fa-caret-down dropdown-caret"></i>
+                </div>
+                <div class="reports-dropdown">
+                    <a href="dailyreport.html"><i class="fas fa-folder-open"></i> Sales & Summary</a>
+
+
+                 
+                </div>
+            </div>
+        </div>
+        <div class="logout-container">
+            <a href="login.html" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="top-bar">
+        <div class="menu-toggle" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+        </div>
+        <div class="right-menu">
+            <div class="notification-bell">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge">3</span>
+            </div>
+            <div class="user-profile">
+                <div class="profile-img">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="profile-menu">
+               
+                    <a href="setup.html"><i class="fas fa-cog"></i> Settings</a>
+                    <a href="login.html"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

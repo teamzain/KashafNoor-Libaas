@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Management</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style/style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 998;
+            display: none;
+        }
+
+        .loader {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 2s linear infinite;
+            z-index: 999;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .main-content {
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #eaeaea;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-reset {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .btn-reset:hover {
+            background-color: #c0392b;
+        }
+
+        .search-container {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eaeaea;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            padding: 20px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th, .table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eaeaea;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* Custom Alert Styles */
+        .custom-alert {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .custom-alert-content {
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+
+        .custom-alert-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #e74c3c;
+        }
+
+        .custom-alert-message {
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        .custom-alert-btn {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .custom-alert-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .success .custom-alert-icon {
+            color: #2ecc71;
+        }
+
+        .warning .custom-alert-icon {
+            color: #f39c12;
+        }
+
+        /* Total expense summary card */
+        .summary-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+
+        .summary-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .summary-amount {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .date-range-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eaeaea;
+            align-items: center;
+        }
+
+        .date-inputs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+
+        .date-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .date-group label {
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .date-group input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .no-data-message {
+            text-align: center;
+            padding: 30px;
+            font-size: 16px;
+            color: #7f8c8d;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .date-range-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="overlay" class="overlay"></div>
+    <div id="loader" class="loader"></div>
+ 
+    <!-- Custom Alert Component -->
+    <div id="customAlert" class="custom-alert">
+        <div class="custom-alert-content">
+            <div id="alertIcon" class="custom-alert-icon">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <div id="alertMessage" class="custom-alert-message">Alert message goes here</div>
+            <button id="alertBtn" class="custom-alert-btn">OK</button>
+        </div>
+    </div>
+
+    <main class="main-content">
+        <div class="container">
+            <!-- Total Expense Summary Card -->
+            <div class="summary-card">
+                <div class="summary-title">
+                    <i class="fas fa-chart-pie"></i> Total Expenses
+                </div>
+                <div class="summary-amount" id="totalExpenseAmount">0.00</div>
+            </div>
+            
+            <div class="card">
+                <div class="header">
+                    <h1><i class="fas fa-receipt"></i> Expense Management</h1>
+                    <button id="addExpenseBtn" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Expense
+                    </button>
+                </div>
+
+                <div class="date-range-container">
+                    <div class="date-inputs">
+                        <div class="date-group">
+                            <label for="startDate">From:</label>
+                            <input type="date" id="startDate">
+                        </div>
+                        <div class="date-group">
+                            <label for="endDate">To:</label>
+                            <input type="date" id="endDate">
+                        </div>
+                    </div>
+                    <div class="filter-buttons">
+                        <button id="applyFilter" class="btn btn-primary">
+                            <i class="fas fa-filter"></i> Apply Filter
+                        </button>
+                        <button id="resetFilter" class="btn btn-reset">
+                            <i class="fas fa-sync-alt"></i> Reset
+                        </button>
+                    </div>
+                </div>
+
+                <div class="search-container">
+                    <input type="text" id="searchField" placeholder="Search expenses..." onkeyup="filterExpenses()">
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Expense ID</th>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expenseTableBody">
+                            <!-- Expense data will be dynamically inserted here -->
+                        </tbody>
+                    </table>
+                    <div id="noDataMessage" class="no-data-message" style="display: none;">
+                        No expenses found for the selected date range.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="expenseModal" class="modal">
+            <div class="modal-content">
+                <h2 id="modalTitle">Add Expense</h2>
+                <form id="expenseForm">
+                    <div class="form-group">
+                        <label for="expenseName">Expense Name</label>
+                        <input type="text" id="expenseName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="expenseDescription">Description</label>
+                        <textarea id="expenseDescription" ></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="expenseAmount">Amount</label>
+                        <input type="number" id="expenseAmount" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="expenseDate">Date</label>
+                        <input type="date" id="expenseDate" required>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="saveExpense" class="btn btn-primary">Save</button>
+                        <button type="button" id="cancelExpense" class="btn">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+    <script>
+ // This function sets today's date in YYYY-MM-DD format for date inputs
+function setTodayDate() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // January is 0
+    const day = String(today.getDate()).padStart(2, '0');
+    
+    const formattedDate = `${year}-${month}-${day}`;
+    
+    // Set the default dates for filter
+    document.getElementById('startDate').value = formattedDate;
+    document.getElementById('endDate').value = formattedDate;
+    
+    // Also set default date for the expense form
+    document.getElementById('expenseDate').value = formattedDate;
+    
+    // Store current dates for filtering
+    currentStartDate = formattedDate;
+    currentEndDate = formattedDate;
+    
+    return formattedDate;
+}
+
+// Replace the existing setDefaultDates function with this
+function setDefaultDates() {
+    const todayStr = setTodayDate();
+    
+    // Store current dates
+    currentStartDate = todayStr;
+    currentEndDate = todayStr;
+}
+
+// Modify the document.addEventListener('DOMContentLoaded'...) section to:
+document.addEventListener('DOMContentLoaded', function() {
+    setTodayDate();
+    
+    // For debugging
+    console.log("Today's date set to:", document.getElementById('endDate').value);
+});
+
+// Update the addExpenseBtn event listener:
+
+      </script>
+    <script>
+        window.api = {
+            getExpenses: async () => {
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                return [
+                    { expense_id: 1, name: 'Office Supplies', description: 'Purchased stationery, paper, and printer ink', amount: 250.75, date: '2025-02-15' },
+                    { expense_id: 2, name: 'Utility Bills', description: 'Monthly electricity and water bills', amount: 450.00, date: '2025-02-20' },
+                    { expense_id: 3, name: 'Software Subscription', description: 'Monthly subscription for design software', amount: 75.99, date: '2025-02-27' },
+                    { expense_id: 4, name: 'Team Lunch', description: 'Team lunch meeting', amount: 120.50, date: '2025-02-27' },
+                    { expense_id: 5, name: 'Conference Tickets', description: 'Industry conference registration', amount: 350.00, date: '2025-01-15' },
+                    { expense_id: 6, name: 'Travel Expenses', description: 'Business trip to client meeting', amount: 520.85, date: '2025-01-20' }
+                ];
+            },
+            addExpense: async (expense) => {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                return { success: true, expenseId: Math.floor(Math.random() * 1000) + 7 };
+            },
+            updateExpense: async (expense) => {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                return { success: true };
+            },
+            deleteExpense: async (id) => {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                return { success: true };
+            }
+        };
+
+        let currentEditingExpenseId = null;
+        let allExpenses = [];
+        let filteredExpenses = [];
+        let loaderTimeout = null;
+        let currentStartDate = null;
+        let currentEndDate = null;
+        let searchTerm = '';
+
+        // Custom Alert Function
+        function showCustomAlert(message, type = 'error') {
+            const alertElement = document.getElementById('customAlert');
+            const alertMessage = document.getElementById('alertMessage');
+            const alertIcon = document.getElementById('alertIcon');
+            const alertContent = alertElement.querySelector('.custom-alert-content');
+            
+            // Set message
+            alertMessage.textContent = message;
+            
+            // Reset classes
+            alertContent.classList.remove('success', 'warning', 'error');
+            
+            // Set icon based on type
+            if (type === 'success') {
+                alertContent.classList.add('success');
+                alertIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+            } else if (type === 'warning') {
+                alertContent.classList.add('warning');
+                alertIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+            } else {
+                alertContent.classList.add('error');
+                alertIcon.innerHTML = '<i class="fas fa-exclamation-circle"></i>';
+            }
+            
+            // Show alert
+            alertElement.style.display = 'flex';
+            
+            // Set focus to the OK button
+            document.getElementById('alertBtn').focus();
+        }
+
+        // Close alert when OK button is clicked
+        document.getElementById('alertBtn').addEventListener('click', function() {
+            document.getElementById('customAlert').style.display = 'none';
+        });
+
+        function showLoader(minDuration = 2000) {
+            if (loaderTimeout) {
+                clearTimeout(loaderTimeout);
+            }
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('loader').style.display = 'block';
+            loaderTimeout = setTimeout(hideLoader, minDuration);
+        }
+
+        function hideLoader() {
+            if (loaderTimeout) {
+                clearTimeout(loaderTimeout);
+            }
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('loader').style.display = 'none';
+        }
+
+        async function safeApiCall(apiCall) {
+            showLoader(1000);
+            try {
+                return await apiCall();
+            } catch (error) {
+                console.error('Error:', error);
+                throw error;
+            } finally {
+                setTimeout(hideLoader, 1000);
+            }
+        }
+
+        function initializeEventListeners() {
+            document.getElementById('addExpenseBtn').addEventListener('click', () => {
+    resetForm();
+    document.getElementById('modalTitle').innerText = 'Add Expense';
+    currentEditingExpenseId = null;
+    
+    // Set today's date for the expense form
+    document.getElementById('expenseDate').value = setTodayDate();
+    
+    toggleModal(true);
+});
+
+            document.getElementById('cancelExpense').addEventListener('click', () => {
+                resetForm();
+                toggleModal(false);
+            });
+
+            document.getElementById('saveExpense').addEventListener('click', async () => {
+                // Get values from the form
+                const expenseName = document.getElementById('expenseName').value;
+                const expenseDescription = document.getElementById('expenseDescription').value;
+                const expenseAmount = document.getElementById('expenseAmount').value;
+                const expenseDate = document.getElementById('expenseDate').value;
+
+                // Validate form input
+                if (!expenseName || !expenseAmount || !expenseDate) {
+                    showCustomAlert('Please fill in all required fields', 'error');
+                    return;
+                }
+
+                // Create expense object with the property names matching what the backend expects
+                const expense = { 
+                    expenseName: expenseName,
+                    expenseDescription: expenseDescription,
+                    expenseAmount: parseFloat(expenseAmount),
+                    expenseDate: expenseDate
+                };
+                
+                console.log('Sending expense data:', expense);
+
+                try {
+                    if (currentEditingExpenseId) {
+                        expense.expense_id = currentEditingExpenseId;
+                        await safeApiCall(() => window.api.updateExpense(expense));
+                        showCustomAlert('Expense updated successfully!', 'success');
+                    } else {
+                        const result = await safeApiCall(() => window.api.addExpense(expense));
+                        console.log('Add result:', result);
+                        showCustomAlert('Expense added successfully!', 'success');
+                    }
+
+                    resetForm();
+                    toggleModal(false);
+                    await loadExpenses();
+                } catch (error) {
+                    console.error('Error saving expense:', error);
+                    showCustomAlert('Failed to save expense: ' + error.message, 'error');
+                }
+            });
+
+            // Date filter event listeners
+            document.getElementById('applyFilter').addEventListener('click', applyDateFilter);
+            document.getElementById('resetFilter').addEventListener('click', resetDateFilter);
+        }
+
+        async function loadExpenses() {
+            try {
+                const expenses = await safeApiCall(window.api.getExpenses);
+                allExpenses = expenses;
+                
+                // Initialize with current date filter by default
+                setDefaultDates();
+                applyDateFilter();
+            } catch (error) {
+                console.error('Error loading expenses:', error);
+                showCustomAlert('Error loading expenses: ' + error.message, 'error');
+            }
+        }
+
+        // function setDefaultDates() {
+        //     const today = new Date();
+        //     const todayStr = today.toISOString().split('T')[0];
+            
+        //     // Set both date inputs to today's date
+        //     document.getElementById('startDate').value = todayStr;
+        //     document.getElementById('endDate').value = todayStr;
+            
+        //     // Store current dates
+        //     currentStartDate = todayStr;
+        //     currentEndDate = todayStr;
+        // }
+
+        function applyDateFilter() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            if (!startDate || !endDate) {
+                showCustomAlert('Please select both start and end dates', 'warning');
+                return;
+            }
+            
+            // Store current filter dates
+            currentStartDate = startDate;
+            currentEndDate = endDate;
+            
+            // Filter expenses by date range
+            filterExpensesByDateAndSearch();
+        }
+
+        function resetDateFilter() {
+            // Reset to today's date
+            setDefaultDates();
+            
+            // Reset search field
+            document.getElementById('searchField').value = '';
+            searchTerm = '';
+            
+            // Apply the filter
+            filterExpensesByDateAndSearch();
+        }
+
+        function filterExpensesByDateAndSearch() {
+            // First filter by date
+            filteredExpenses = allExpenses.filter(expense => {
+                const expenseDate = expense.expense_date || expense.date;
+                return expenseDate >= currentStartDate && expenseDate <= currentEndDate;
+            });
+            
+            // Then filter by search term if one exists
+            if (searchTerm) {
+                filteredExpenses = filteredExpenses.filter(expense => {
+                    const name = (expense.expense_name || expense.name || '').toLowerCase();
+                    const description = (expense.expense_description || expense.description || '').toLowerCase();
+                    return name.includes(searchTerm) || description.includes(searchTerm);
+                });
+            }
+            
+            // Display filtered expenses
+            displayExpenses(filteredExpenses);
+            updateTotalExpense(filteredExpenses);
+        }
+
+        function filterExpenses() {
+            searchTerm = document.getElementById('searchField').value.toLowerCase();
+            filterExpensesByDateAndSearch();
+        }
+
+        function displayExpenses(expenses) {
+    const expenseTableBody = document.getElementById('expenseTableBody');
+    const noDataMessage = document.getElementById('noDataMessage');
+    
+    expenseTableBody.innerHTML = '';
+    
+    if (expenses.length === 0) {
+        // Show no data message and hide table
+        noDataMessage.style.display = 'block';
+        return;
+    }
+    
+    // Hide no data message and show table data
+    noDataMessage.style.display = 'none';
+
+    expenses.forEach(expense => {
+        // Get description or default to "No description provided"
+        const description = (expense.expense_description || expense.description) ? 
+                            (expense.expense_description || expense.description) : 
+                            "No description provided";
+        
+        const row = expenseTableBody.insertRow();
+        row.innerHTML = `
+            <td>${expense.expense_id}</td>
+            <td>${expense.expense_name || expense.name}</td>
+            <td>${description}</td>
+            <td>${parseFloat(expense.expense_amount || expense.amount).toFixed(2)}</td>
+            <td>${formatDate(expense.expense_date || expense.date)}</td>
+            <td>
+                <div class="action-buttons">
+                    <button onclick="editExpense(${expense.expense_id})" class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button onclick="confirmDelete(${expense.expense_id})" class="btn">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            </td>
+        `;
+    });
+}
+        function updateTotalExpense(expenses) {
+            const totalAmount = expenses.reduce((total, expense) => {
+                return total + parseFloat(expense.expense_amount || expense.amount);
+            }, 0);
+            
+            document.getElementById('totalExpenseAmount').textContent = `${totalAmount.toFixed(2)}`;
+        }
+
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString(undefined, options);
+        }
+
+        function editExpense(id) {
+            const expense = allExpenses.find(e => e.expense_id === id);
+
+            if (expense) {
+                // Handle both property naming formats
+                document.getElementById('expenseName').value = expense.expense_name || expense.name;
+                document.getElementById('expenseDescription').value = expense.expense_description || expense.description;
+                document.getElementById('expenseAmount').value = expense.expense_amount || expense.amount;
+                document.getElementById('expenseDate').value = expense.expense_date || expense.date;
+
+                document.getElementById('modalTitle').innerText = 'Edit Expense';
+                currentEditingExpenseId = id;
+                toggleModal(true);
+            }
+        }
+
+        function confirmDelete(id) {
+            // Using custom confirmation instead of the browser's confirm() dialog
+            showCustomAlert('Are you sure you want to delete this expense?', 'warning');
+            
+            // Modify the OK button to delete if confirmed
+            const alertBtn = document.getElementById('alertBtn');
+            const originalText = alertBtn.textContent;
+            
+            // Change button text and add a cancel button
+            alertBtn.textContent = 'Delete';
+            
+            // Create and add cancel button if it doesn't exist
+            if (!document.getElementById('alertCancelBtn')) {
+                const cancelBtn = document.createElement('button');
+                cancelBtn.id = 'alertCancelBtn';
+                cancelBtn.className = 'custom-alert-btn';
+                cancelBtn.style.marginRight = '10px';
+                cancelBtn.style.backgroundColor = '#7f8c8d';
+                cancelBtn.textContent = 'Cancel';
+                alertBtn.parentNode.insertBefore(cancelBtn, alertBtn);
+                
+                cancelBtn.addEventListener('click', function() {
+                    document.getElementById('customAlert').style.display = 'none';
+                    alertBtn.textContent = originalText;
+                    cancelBtn.remove();
+                });
+            }
+            
+            // Override the alertBtn click event temporarily
+            const originalAlertBtnClick = alertBtn.onclick;
+            alertBtn.onclick = null;
+            
+            alertBtn.addEventListener('click', async function handleDelete() {
+                // Reset the button
+                alertBtn.textContent = originalText;
+                document.getElementById('alertCancelBtn').remove();
+                
+                // Restore original event handler
+                alertBtn.removeEventListener('click', handleDelete);
+                alertBtn.onclick = originalAlertBtnClick;
+                
+                // Hide the alert
+                document.getElementById('customAlert').style.display = 'none';
+                
+                // Delete the expense
+                try {
+                    await safeApiCall(() => window.api.deleteExpense(id));
+                    showCustomAlert('Expense deleted successfully!', 'success');
+                    await loadExpenses();
+                } catch (error) {
+                    console.error('Error:', error);
+                    showCustomAlert('Error deleting expense: ' + error.message, 'error');
+                }
+            }, { once: true });
+        }
+
+        function toggleModal(show) {
+            const modal = document.getElementById('expenseModal');
+            modal.style.display = show ? 'flex' : 'none';
+        }
+
+        function resetForm() {
+            document.getElementById('expenseForm').reset();
+            currentEditingExpenseId = null;
+        }
+
+        // Make functions available globally
+        window.editExpense = editExpense;
+        window.confirmDelete = confirmDelete;
+        window.filterExpenses = filterExpenses;
+
+        window.onload = () => {
+            initializeEventListeners();
+            loadExpenses();
+        };
+    </script>
+
+<script src="js/navbar.js"></script>
+</body>
+</html>

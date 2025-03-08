@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Backup Settings</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --primary-hover: #3a56d4;
+            --success-color: #38b000;
+            --danger-color: #d90429;
+            --light-bg: #f8f9fa;
+            --border-radius: 10px;
+            --shadow: 0 8px 20px rgba(0,0,0,0.08);
+        }
+        
+        body {
+            background-color: #f5f7fc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .backup-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            background-color: white;
+        }
+        
+        .backup-header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+        
+        .backup-header h2 {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .backup-settings {
+            margin-bottom: 30px;
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .directory-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .backup-status {
+            padding: 20px;
+            border-radius: var(--border-radius);
+            background-color: var(--light-bg);
+            margin: 25px 0;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .backup-status h5 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .success-message {
+            color: var(--success-color);
+            padding: 12px 15px;
+            margin-top: 15px;
+            border-radius: var(--border-radius);
+            background-color: rgba(56, 176, 0, 0.1);
+            display: none;
+            border-left: 4px solid var(--success-color);
+        }
+        
+        .error-message {
+            color: var(--danger-color);
+            padding: 12px 15px;
+            margin-top: 15px;
+            border-radius: var(--border-radius);
+            background-color: rgba(217, 4, 41, 0.1);
+            display: none;
+            border-left: 4px solid var(--danger-color);
+        }
+        
+        .history-container {
+            margin-top: 40px;
+        }
+        
+        .nav-tabs {
+            margin-bottom: 25px;
+            border-bottom: 2px solid #eaedf2;
+        }
+        
+        .nav-tabs .nav-link {
+            color: #495057;
+            border: none;
+            padding: 12px 20px;
+            font-weight: 500;
+            margin-right: 5px;
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: var(--primary-color);
+            background-color: transparent;
+            border-bottom: 3px solid var(--primary-color);
+        }
+        
+        .nav-tabs .nav-link:hover:not(.active) {
+            border-bottom: 3px solid #eaedf2;
+        }
+        
+        .file-size {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        
+        .status-badge {
+            font-size: 0.8rem;
+            padding: 5px 10px;
+            border-radius: 30px;
+            font-weight: 500;
+        }
+        
+        .tab-content {
+            padding-top: 20px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover, .btn-primary:focus {
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .form-select, .form-control {
+            padding: 10px 15px;
+            border-radius: 6px;
+        }
+        
+        .table {
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0,0,0,0.03);
+        }
+        
+        .table thead {
+            background-color: #f3f6fc;
+        }
+        
+        .table thead th {
+            font-weight: 600;
+            color: #495057;
+            padding: 15px;
+        }
+        
+        .table td {
+            padding: 14px 15px;
+            vertical-align: middle;
+        }
+        
+        #currentDbPath, #lastBackup {
+            font-weight: 500;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #495057;
+        }
+        
+        .card-header-tabs .nav-link {
+            padding: 15px 20px;
+        }
+        
+        .info-icon {
+            color: var(--primary-color);
+            margin-right: 10px;
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: #f3f6fc;
+        }
+        
+        .actions-column {
+            width: 120px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #6c757d;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #dee2e6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="backup-container">
+            <ul class="nav nav-tabs" id="backupTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab" aria-controls="settings" aria-selected="true">
+                        <i class="fas fa-cog me-2"></i>Settings
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false">
+                        <i class="fas fa-history me-2"></i>History
+                    </button>
+                </li>
+            </ul>
+            
+            <div class="tab-content" id="backupTabsContent">
+                <!-- Settings Tab -->
+                <div class="tab-pane fade show active" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+                    <div class="backup-header">
+                        <h2><i class="fas fa-database me-2"></i>Database Backup Settings</h2>
+                        <p class="text-muted">Configure automatic backups of your application data to prevent data loss</p>
+                    </div>
+                    
+                    <div class="backup-settings">
+                        <div class="form-check form-switch mb-4">
+                            <input class="form-check-input" type="checkbox" id="enableBackup">
+                            <label class="form-check-label" for="enableBackup">Enable Automatic Backups</label>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="backupInterval" class="form-label">Backup Interval</label>
+                            <select class="form-select" id="backupInterval">
+                                <option value="1">Every minute</option>
+                                <option value="5">Every 5 minutes</option>
+                                <option value="15">Every 15 minutes</option>
+                                <option value="30">Every 30 minutes</option>
+                                <option value="60">Every hour</option>
+                                <option value="360">Every 6 hours</option>
+                                <option value="720">Every 12 hours</option>
+                                <option value="1440">Daily</option>
+                                <option value="10080">Weekly</option>
+                                <option value="43200">Monthly</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="backupRetention" class="form-label">Retention Policy</label>
+                            <select class="form-select" id="backupRetention">
+                                <option value="5">Keep last 5 backups</option>
+                                <option value="10">Keep last 10 backups</option>
+                                <option value="25">Keep last 25 backups</option>
+                                <option value="50">Keep last 50 backups</option>
+                                <option value="0">Keep all backups</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="backupDirectory" class="form-label">Backup Location</label>
+                            <div class="directory-input">
+                                <input type="text" class="form-control" id="backupDirectory" readonly placeholder="Select a directory for backups">
+                                <button class="btn btn-outline-primary" id="selectDirectoryBtn">
+                                    <i class="fas fa-folder-open me-2"></i>Browse
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="backup-status">
+                            <h5><i class="fas fa-info-circle me-2"></i>Database Information</h5>
+                            <p><i class="fas fa-database me-2 info-icon"></i>Current database: <span id="currentDbPath">Loading...</span></p>
+                            <p><i class="fas fa-clock me-2 info-icon"></i>Last backup: <span id="lastBackup">None</span></p>
+                            <p><i class="fas fa-calendar-check me-2 info-icon"></i>Next scheduled backup: <span id="nextBackupTime">Not scheduled</span></p>
+                        </div>
+                        
+                        <div class="success-message" id="successMessage"></div>
+                        <div class="error-message" id="errorMessage"></div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-primary" id="saveSettingsBtn">
+                            <i class="fas fa-save me-2"></i>Save Settings
+                        </button>
+                        <button class="btn btn-success" id="backupNowBtn">
+                            <i class="fas fa-database me-2"></i>Backup Now
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- History Tab -->
+                <div class="tab-pane fade" id="history" role="tabpanel" aria-labelledby="history-tab">
+                    <div class="backup-header">
+                        <h2><i class="fas fa-history me-2"></i>Backup History</h2>
+                        <p class="text-muted">View all previous database backups and their status</p>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date & Time</th>
+                                    <th>Location</th>
+                                    <th>Size</th>
+                                    <th>Status</th>
+                                    <th class="actions-column">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="backupHistoryTable">
+                                <tr>
+                                    <td colspan="5" class="text-center">
+                                        <div class="py-4">
+                                            <i class="fas fa-spinner fa-spin me-2"></i>Loading backup history...
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <button class="btn btn-outline-primary" id="refreshHistoryBtn">
+                            <i class="fas fa-sync-alt me-2"></i>Refresh History
+                        </button>
+                        <button class="btn btn-outline-danger" id="clearHistoryBtn">
+                            <i class="fas fa-trash-alt me-2"></i>Clear History
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/navbar.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+ <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+  // Elements - Settings Tab
+  const enableBackupSwitch = document.getElementById('enableBackup');
+  const backupIntervalSelect = document.getElementById('backupInterval');
+  const backupRetentionSelect = document.getElementById('backupRetention');
+  const backupDirectoryInput = document.getElementById('backupDirectory');
+  const selectDirectoryBtn = document.getElementById('selectDirectoryBtn');
+  const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+  const backupNowBtn = document.getElementById('backupNowBtn');
+  const currentDbPathEl = document.getElementById('currentDbPath');
+  const lastBackupEl = document.getElementById('lastBackup');
+  const nextBackupTimeEl = document.getElementById('nextBackupTime');
+  const successMessageEl = document.getElementById('successMessage');
+  const errorMessageEl = document.getElementById('errorMessage');
+  
+  // Elements - History Tab
+  const backupHistoryTable = document.getElementById('backupHistoryTable');
+  const refreshHistoryBtn = document.getElementById('refreshHistoryBtn');
+  const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+  
+  // Tab handling
+  const historyTab = document.getElementById('history-tab');
+  historyTab.addEventListener('click', loadBackupHistory);
+  refreshHistoryBtn.addEventListener('click', loadBackupHistory);
+  
+  // Load initial settings
+  await loadSettings();
+  
+  // Load initial history if starting on history tab
+  if (historyTab.classList.contains('active')) {
+    loadBackupHistory();
+  }
+  
+  // Clear history
+  clearHistoryBtn.addEventListener('click', async () => {
+    if (confirm('Are you sure you want to clear the backup history? This will only remove history records, not the actual backup files.')) {
+      try {
+        const result = await window.api.backup.clearHistory();
+        if (result.success) {
+          await loadBackupHistory();
+          showSuccess('Backup history cleared successfully');
+        } else {
+          showError(`Failed to clear history: ${result.error}`);
+        }
+      } catch (error) {
+        showError('An error occurred while clearing history');
+        console.error(error);
+      }
+    }
+  });
+  
+  // Directory selection
+  selectDirectoryBtn.addEventListener('click', async () => {
+    try {
+      const directory = await window.api.backup.selectDirectory();
+      if (directory) {
+        backupDirectoryInput.value = directory;
+      }
+    } catch (error) {
+      showError('Failed to select directory');
+      console.error(error);
+    }
+  });
+  
+  // Save settings
+  saveSettingsBtn.addEventListener('click', async () => {
+    try {
+      if (!backupDirectoryInput.value && enableBackupSwitch.checked) {
+        showError('Please select a backup directory');
+        return;
+      }
+      
+      const config = {
+        enabled: enableBackupSwitch.checked,
+        interval: parseInt(backupIntervalSelect.value),
+        directory: backupDirectoryInput.value,
+        retention: parseInt(backupRetentionSelect.value)
+      };
+      
+      // Log the config being sent to ensure it has the correct values
+      console.log('Saving backup config:', config);
+      
+      saveSettingsBtn.disabled = true;
+      saveSettingsBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
+      
+      const result = await window.api.backup.setConfig(config);
+      
+      if (result.success) {
+        showSuccess('Backup settings saved successfully');
+        
+        // Reload settings to show the updated config
+        await loadSettings();
+        
+        // Save was successful, let's verify our settings were applied
+        const savedConfig = await window.api.backup.getConfig();
+        console.log('Retrieved config after save:', savedConfig);
+      } else {
+        showError(`Failed to save settings: ${result.error}`);
+      }
+    } catch (error) {
+      showError('An error occurred while saving settings');
+      console.error(error);
+    } finally {
+      saveSettingsBtn.disabled = false;
+      saveSettingsBtn.innerHTML = '<i class="fas fa-save me-2"></i>Save Settings';
+    }
+  });
+  
+  // Manual backup
+  backupNowBtn.addEventListener('click', async () => {
+    try {
+      if (!backupDirectoryInput.value) {
+        showError('Please select a backup directory first');
+        return;
+      }
+      
+      backupNowBtn.disabled = true;
+      backupNowBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Backing up...';
+      
+      const result = await window.api.backup.runNow();
+      
+      if (result.success) {
+        const now = new Date();
+        showSuccess(`Backup created successfully at ${now.toLocaleTimeString()}`);
+        lastBackupEl.textContent = now.toLocaleString();
+        await loadBackupHistory(); // Refresh history after backup
+      } else {
+        showError(`Backup failed: ${result.error}`);
+      }
+    } catch (error) {
+      showError('An error occurred during backup');
+      console.error(error);
+    } finally {
+      backupNowBtn.disabled = false;
+      backupNowBtn.innerHTML = '<i class="fas fa-database me-2"></i>Backup Now';
+    }
+  });
+  
+  // IMPROVED: Listen for backup completion events
+  window.api.on.backupCompleted((data) => {
+    console.log('Backup completed event received:', data);
+    
+    // Update the last backup time
+    const lastBackupTime = new Date(data.timestamp);
+    lastBackupEl.textContent = lastBackupTime.toLocaleString();
+    
+    // Refresh the backup history if on the history tab
+    if (document.getElementById('history-tab').classList.contains('active')) {
+      loadBackupHistory();
+    }
+    
+    // Update the next backup time by reloading settings
+    loadSettings();
+    
+    // Show a success message with backup type
+    const backupTypeText = data.type === 'auto' ? 'Automatic' : 'Manual';
+    showSuccess(`${backupTypeText} backup completed at ${lastBackupTime.toLocaleTimeString()}`);
+  });
+
+  // Listen for backup failure events
+  window.api.on.backupFailed((data) => {
+    console.error('Backup failed:', data);
+    const backupTypeText = data.type === 'auto' ? 'Automatic' : 'Manual';
+    showError(`${backupTypeText} backup failed: ${data.error}`);
+  });
+  
+  function updateNextBackupTimeFromConfig(config) {
+    if (!config.enabled) {
+      nextBackupTimeEl.textContent = 'Not scheduled';
+      return;
+    }
+    
+    if (!config.lastBackup) {
+      // If no backup has been made yet, start from now
+      const now = new Date();
+      const nextBackup = new Date(now.getTime() + config.interval * 60 * 1000);
+      nextBackupTimeEl.textContent = nextBackup.toLocaleString();
+      return;
+    }
+    
+    // Calculate next backup time based on last backup and interval
+    const lastBackup = new Date(config.lastBackup);
+    const nextBackup = new Date(lastBackup.getTime() + config.interval * 60 * 1000);
+    
+    // If the next backup time is in the past, calculate when the next one will actually occur
+    if (nextBackup < new Date()) {
+      const now = new Date();
+      const timeSinceLastBackup = now - lastBackup;
+      const intervalMs = config.interval * 60 * 1000;
+      const backupsSkipped = Math.floor(timeSinceLastBackup / intervalMs);
+      const nextBackupTime = new Date(lastBackup.getTime() + (backupsSkipped + 1) * intervalMs);
+      nextBackupTimeEl.textContent = nextBackupTime.toLocaleString();
+    } else {
+      nextBackupTimeEl.textContent = nextBackup.toLocaleString();
+    }
+  }
+
+  // IMPROVED: Function to better detect backup type
+  function loadBackupHistory() {
+    try {
+      backupHistoryTable.innerHTML = `
+        <tr>
+          <td colspan="5" class="text-center">
+            <div class="py-4">
+              <i class="fas fa-spinner fa-spin me-2"></i>Loading backup history...
+            </div>
+          </td>
+        </tr>
+      `;
+      
+      window.api.backup.getHistory().then(history => {
+        console.log('Loaded backup history:', history);
+        
+        if (!history || history.length === 0) {
+          backupHistoryTable.innerHTML = `
+            <tr>
+              <td colspan="5">
+                <div class="empty-state">
+                  <i class="fas fa-database"></i>
+                  <p>No backup history found</p>
+                  <small>Backups you create will appear here</small>
+                </div>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+        
+        let tableRows = '';
+        history.forEach(backup => {
+          // Fix date parsing issues by ensuring we have a valid date object
+          const backupDate = parseBackupDate(backup.backup_time);
+          const dateString = backupDate.toLocaleString();
+          
+          const sizeFormatted = formatFileSize(backup.backup_size);
+          const statusClass = backup.status === 'success' ? 'bg-success' : 'bg-danger';
+          
+          // Improved type detection
+          let backupType = backup.type || 'unknown';
+          
+          // If type is unknown, try to detect from the file path
+          if (backupType === 'unknown') {
+            if (backup.backup_path.includes('-auto.db')) {
+              backupType = 'auto';
+            } else if (backup.backup_path.includes('-manual.db')) {
+              backupType = 'manual';
+            } else {
+              // Fallback to checking seconds (less reliable)
+              const seconds = backupDate.getSeconds();
+              if (seconds === 0 || seconds === 1 || seconds === 59) {
+                backupType = 'auto';
+              } else {
+                backupType = 'manual';
+              }
+            }
+            console.log(`Inferred backup type for ${dateString} from path: ${backupType}`);
+          }
+          
+          const backupTypeDisplay = backupType === 'auto' ? 
+            '<span class="badge bg-info me-1">Auto</span>' : 
+            '<span class="badge bg-primary me-1">Manual</span>';
+            const { formattedDate } = parseAndFormatTimestamp(backup.backup_time);
+          tableRows += `
+            <tr>
+            <td>${formattedDate}</td>
+              <td class="text-truncate" style="max-width: 200px;" title="${backup.backup_path}">${backup.backup_path}</td>
+              <td class="file-size">${sizeFormatted}</td>
+              <td>
+                ${backupTypeDisplay}
+                <span class="status-badge ${statusClass} text-white">${backup.status}</span>
+              </td>
+              <td class="actions-column">
+                <div class="btn-group">
+                  <button class="btn btn-sm btn-outline-secondary open-folder-btn" data-backup-dir="${getDirectoryPath(backup.backup_path)}" title="Open folder">
+                    <i class="fas fa-folder-open"></i>
+                  </button>
+                
+                </div>
+              </td>
+            </tr>
+          `;
+        });
+        
+        backupHistoryTable.innerHTML = tableRows;
+        
+        // Add event listeners for open folder buttons
+        document.querySelectorAll('.open-folder-btn').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            const dirPath = e.currentTarget.getAttribute('data-backup-dir');
+            try {
+              await window.api.openDirectory(dirPath);
+            } catch (error) {
+              showError('Failed to open directory');
+              console.error(error);
+            }
+          });
+        });
+        
+        // Add event listeners for restore backup buttons
+        document.querySelectorAll('.restore-backup-btn').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            const backupPath = e.currentTarget.getAttribute('data-backup-path');
+            
+            if (confirm(`Are you sure you want to restore the database from this backup? Current data will be replaced with data from the backup.`)) {
+              try {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                
+                const result = await window.api.backup.restore(backupPath);
+                
+                if (result.success) {
+                  showSuccess(`Database successfully restored from backup`);
+                  // Refresh history after restoring
+                  loadBackupHistory();
+                } else {
+                  showError(`Failed to restore backup: ${result.error}`);
+                }
+              } catch (error) {
+                showError('Error restoring backup');
+                console.error(error);
+              } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-undo"></i>';
+              }
+            }
+          });
+        });
+      }).catch(error => {
+        console.error('Failed to load backup history:', error);
+        backupHistoryTable.innerHTML = `
+          <tr>
+            <td colspan="5" class="text-center text-danger">
+              <div class="py-3">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Error loading backup history: ${error.message}
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+    } catch (error) {
+      console.error('Failed to load backup history:', error);
+      backupHistoryTable.innerHTML = `
+        <tr>
+          <td colspan="5" class="text-center text-danger">
+            <div class="py-3">
+              <i class="fas fa-exclamation-triangle me-2"></i>
+              Error loading backup history: ${error.message}
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+  }
+  function parseAndFormatTimestamp(isoTimestamp) {
+  try {
+    // Validate input
+    if (!isoTimestamp || typeof isoTimestamp !== 'string') {
+      console.error('Invalid timestamp:', isoTimestamp);
+      return {
+        formattedDate: 'Invalid Date',
+        date: new Date()
+      };
+    }
+
+    // Create a date object from ISO timestamp
+    const date = new Date(isoTimestamp);
+
+    // Verify the date is valid
+    if (isNaN(date.getTime())) {
+      console.error('Unable to parse timestamp:', isoTimestamp);
+      return {
+        formattedDate: 'Invalid Date',
+        date: new Date()
+      };
+    }
+
+    // Custom formatting function
+    const formatTime = (date) => {
+      // Convert to 12-hour format
+      let hours = date.getHours();
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      
+      // Adjust hours to 12-hour format
+      hours = hours % 12;
+      hours = hours ? hours : 12; // handle midnight (0 hours)
+      const formattedHours = hours.toString().padStart(2, '0');
+
+      // Format the full date string
+      return `${date.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric', 
+        year: 'numeric' 
+      })}, ${formattedHours}:${minutes} ${ampm}`;
+    };
+
+    // Debug logging
+    console.log('Original ISO Timestamp:', isoTimestamp);
+    console.log('Parsed Date Object:', date);
+
+    return {
+      formattedDate: formatTime(date),
+      date: date
+    };
+  } catch (error) {
+    console.error('Comprehensive error parsing timestamp:', error);
+    return {
+      formattedDate: 'Invalid Date',
+      date: new Date()
+    };
+  }
+}
+
+// Debugging function to compare times
+function compareTimestamps() {
+  const currentTime = new Date();
+  console.log('Current System Time (Full):', currentTime);
+  console.log('Current System Time (Components):',{
+    year: currentTime.getFullYear(),
+    month: currentTime.getMonth() + 1,
+    day: currentTime.getDate(),
+    hours: currentTime.getHours(),
+    minutes: currentTime.getMinutes(),
+    seconds: currentTime.getSeconds()
+  });
+}
+
+// Call this to get current system time details
+compareTimestamps();
+// Example usage
+
+
+function parseBackupDate(dateString) {
+  try {
+    // First, try parsing the date in UTC
+    let date = new Date(dateString);
+    
+    // If parsing fails, try more robust parsing methods
+    if (isNaN(date.getTime())) {
+      // Remove timezone info and try parsing
+      const cleanDateString = dateString.replace(/\s*\(.*\)$/, '').trim();
+      date = new Date(cleanDateString);
+    }
+    
+    // If still invalid, create a date object and convert to PKT
+    if (isNaN(date.getTime())) {
+      console.warn(`Invalid date string: ${dateString}, using current date`);
+      date = new Date();
+    }
+    
+    // Convert to Pakistan Standard Time
+    const pktDate = new Date(date.toLocaleString('en-US', { timeZone: 'Asia/Karachi' }));
+    
+    return pktDate;
+  } catch (error) {
+    console.error('Error parsing date in Pakistan time:', error);
+    return new Date(); // Fallback to current date
+  }
+}
+
+// Logging function to help debug time zone issues
+function logDateInfo(date) {
+  console.log('Original Date (UTC):', date);
+  console.log('Date in Pakistan Time:', new Date(date.toLocaleString('en-US', { timeZone: 'Asia/Karachi' })));
+  console.log('Formatted PKT Date:', formatBackupDate(date));
+}
+  async function loadSettings() {
+    try {
+      // Display current database path
+      const dbPath = await window.api.getDatabaseLocation();
+      currentDbPathEl.textContent = dbPath || 'Not available';
+      
+      // Load current settings
+      const config = await window.api.backup.getConfig();
+      console.log('Loaded settings:', config);
+      
+      enableBackupSwitch.checked = config.enabled;
+      
+      // Make sure the interval value exists in the dropdown
+      const intervalValue = config.interval.toString();
+      const intervalOption = Array.from(backupIntervalSelect.options).find(option => option.value === intervalValue);
+      if (intervalOption) {
+        backupIntervalSelect.value = intervalValue;
+      } else {
+        // If the value doesn't exist in the dropdown, add it
+        const newOption = document.createElement('option');
+        newOption.value = intervalValue;
+        newOption.textContent = `Custom (${intervalValue} minutes)`;
+        backupIntervalSelect.appendChild(newOption);
+        backupIntervalSelect.value = intervalValue;
+      }
+      
+      backupDirectoryInput.value = config.directory || '';
+      
+      // Handle retention setting
+      const retentionValue = config.retention ? config.retention.toString() : '10';
+      const retentionOption = Array.from(backupRetentionSelect.options).find(option => option.value === retentionValue);
+      if (retentionOption) {
+        backupRetentionSelect.value = retentionValue;
+      } else {
+        // If the value doesn't exist in the dropdown, add it
+        const newOption = document.createElement('option');
+        newOption.value = retentionValue;
+        newOption.textContent = `Keep last ${retentionValue} backups`;
+        backupRetentionSelect.appendChild(newOption);
+        backupRetentionSelect.value = retentionValue;
+      }
+      
+      // Update last backup time
+      if (config.lastBackup) {
+        const lastBackupDate = new Date(config.lastBackup);
+        lastBackupEl.textContent = isNaN(lastBackupDate.getTime()) ? 
+          'None' : lastBackupDate.toLocaleString();
+      } else {
+        lastBackupEl.textContent = 'None';
+      }
+      
+      // Update next backup time calculation
+      updateNextBackupTimeFromConfig(config);
+    } catch (error) {
+      showError('Failed to load backup settings');
+      console.error(error);
+    }
+  }
+
+  function getDirectoryPath(filePath) {
+    if (!filePath) return '';
+    
+    // Handle both Windows and UNIX-style paths
+    const separator = filePath.includes('\\') ? '\\' : '/';
+    return filePath.substring(0, filePath.lastIndexOf(separator));
+  }
+  
+  function formatFileSize(bytes) {
+    if (bytes === 0 || bytes === undefined) return '0 Bytes';
+    
+    try {
+      const bytesNum = Number(bytes);
+      if (isNaN(bytesNum)) return '0 Bytes';
+      
+      const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+      const i = Math.floor(Math.log(bytesNum) / Math.log(1024));
+      return parseFloat((bytesNum / Math.pow(1024, i)).toFixed(2)) + ' ' + sizes[i];
+    } catch (error) {
+      console.error('Error formatting file size:', error);
+      return '0 Bytes';
+    }
+  }
+  
+  function showSuccess(message) {
+    successMessageEl.textContent = message;
+    successMessageEl.style.display = 'block';
+    errorMessageEl.style.display = 'none';
+    
+    setTimeout(() => {
+      successMessageEl.style.display = 'none';
+    }, 5000);
+  }
+  
+  function showError(message) {
+    errorMessageEl.textContent = message;
+    errorMessageEl.style.display = 'block';
+    successMessageEl.style.display = 'none';
+    
+    setTimeout(() => {
+      errorMessageEl.style.display = 'none';
+    }, 5000);
+  }
+
+  // IMPROVED: Auto-refresh functionality
+  let autoRefreshInterval = null;
+
+  function startAutoRefresh() {
+    // Clear any existing interval
+    if (autoRefreshInterval) {
+      clearInterval(autoRefreshInterval);
+    }
+    
+    // Update the UI every minute
+    autoRefreshInterval = setInterval(() => {
+      // Refresh the UI regardless of which tab is active
+      window.api.backup.getConfig().then(config => {
+        updateNextBackupTimeFromConfig(config);
+        
+        // If on history tab, also refresh the history
+        if (document.getElementById('history-tab').classList.contains('active')) {
+          loadBackupHistory();
+        }
+      }).catch(error => {
+        console.error('Error refreshing backup status:', error);
+      });
+    }, 60000); // Update every minute
+  }
+
+  // Start auto-refresh when the page loads
+  startAutoRefresh();
+  
+  // Make loadSettings and loadBackupHistory available globally
+  window.loadSettings = loadSettings;
+  window.loadBackupHistory = loadBackupHistory;
+});
+
+// Use the globally defined functions for the focus event
+window.addEventListener('focus', () => {
+  if (typeof window.loadSettings === 'function') {
+    window.loadSettings();
+    
+    // Also refresh history if on history tab
+    if (document.getElementById('history-tab').classList.contains('active') && 
+        typeof window.loadBackupHistory === 'function') {
+      window.loadBackupHistory();
+    }
+  } else {
+    console.warn('loadSettings function is not accessible in this scope');
+  }
+});
+ </script>
+</body>
+</html>
